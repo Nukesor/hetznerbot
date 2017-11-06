@@ -42,7 +42,7 @@ class Hetzner():
 
         # Create jobs
         job_queue = self.updater.job_queue
-        job_queue.run_repeating(self.process_all, interval=10, first=0)
+        job_queue.run_repeating(self.process_all, interval=600, first=0)
 
         # Create handler
         get_handler = CommandHandler('get', self.get)
