@@ -80,8 +80,8 @@ class Hetzner():
         # Extract message meta data
         offers = self.get_hetzner_offers()
         formatted = self.format_offers(offers)
-        print(formatted)
-        bot.sendMessage(chat_id=chat_id, text=formatted)
+        if formatted:
+            bot.sendMessage(chat_id=chat_id, text=formatted)
 
     def format_offers(self, offers):
         formatted_offers = []
