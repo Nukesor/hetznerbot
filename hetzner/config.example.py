@@ -1,0 +1,10 @@
+# Get your telegram api-key from @botfather
+TELEGRAM_API_KEY = None
+TELEGRAM_USER_NAME = 'test'
+
+MIN_CPU_RATING = 7800
+MIN_HD_COUNT = 3
+MIN_HD_SIZE = 6
+MIN_HD_SIZE_RAID = 6
+MIN_RAM_SIZE = 24
+MAX_PRICE = 54

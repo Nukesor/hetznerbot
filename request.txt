@@ -1,0 +1,13 @@
+curl 'https://robot.your-server.de/order/market' \
+-H 'Cookie: _pk_ref.25.d9aa=%22%5B%5C%22%5C%22%2C%20%5C%22%5C%22%2C%201507383756%2C%20%5C%22https%3A%2F%2Fserverboerse.de%2F%5C%22%5D%22; robot=0299138ce165450b257fe711a273761a; _pk_id.25.d9aa=6bbef30d6956705c.1507383756.30.1509748816.1509748816.; _pk_ses.25.d9aa=*' \
+-H 'Origin: https://robot.your-server.de' \
+-H 'Accept-Encoding: gzip, deflate, br' \
+-H 'Accept-Language: en-US,en;q=0.9,de;q=0.8,ru;q=0.7,id;q=0.6' \
+-H 'Upgrade-Insecure-Requests: 1' \
+-H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8' \
+-H 'Cache-Control: max-age=0' \
+-H 'Referer: https://robot.your-server.de/order/market' \
+-H 'Connection: keep-alive' \
+-H 'DNT: 1' --data 'ram=24&hdsize=2048&hdnr=3&maxprice=500&text=&datacenter=' --compressed
