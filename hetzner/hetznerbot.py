@@ -57,7 +57,11 @@ class Hetzner():
 
     def help(self, bot, update):
         """Send a help text."""
-        help_text = """Available commands:
+        help_text = """A nice little telegram bot, which texts you,
+        if there are any offers on the hetzner server market,
+        that match your defined criteria.
+
+        Available commands:
         /start Start the bot
         /stop Start the bot
         /set Set attributes with this syntax: "\set hd_count 3"
