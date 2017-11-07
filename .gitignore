@@ -63,3 +63,4 @@ target/
 
 # Repository kram
 */**/config.py
+hetznerbot.db
