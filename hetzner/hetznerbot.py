@@ -1,9 +1,11 @@
 """The actual bot."""
 
+import datetime
 from bs4 import BeautifulSoup
 from requests import request
 from hetzner.config import TELEGRAM_API_KEY
 from hetzner.db import get_session
+from hetzner.offer import Offer
 from hetzner.subscriber import Subscriber
 
 from telegram.ext import (
@@ -102,7 +104,7 @@ class Hetzner():
         session = get_session()
         subscriber = self.get_or_create_subscriber(
             session, update.message.chat_id)
-        self.process(bot, subscriber)
+        self.process(bot, subscriber, session=session, get_all=True)
         session.close()
 
     def set(self, bot, update):
@@ -180,14 +182,47 @@ class Hetzner():
             .filter(Subscriber.active == True) \
             .all()
         for subscriber in subscribers:
-            self.process(bot, subscriber)
+            self.process(bot, subscriber, session=session)
         session.close()
 
-    def process(self, bot, subscriber):
+    def process(self, bot, subscriber, session, get_all=False):
         """Send the newest update to all subscribers."""
         # Extract message meta data
         offers = self.get_hetzner_offers(subscriber)
-        formatted = self.format_offers(offers)
+        new_offers = []
+        for offer in offers:
+            db_offer = session.query(Offer) \
+                .filter(Offer.chat_id == subscriber.chat_id) \
+                .filter(Offer.cpu == offer['cpu']) \
+                .filter(Offer.cpu_rating == offer['cpu_rating']) \
+                .filter(Offer.ram == offer['ram']) \
+                .filter(Offer.hd == offer['hd']) \
+                .filter(Offer.price == offer['price']) \
+                .one_or_none()
+            if not db_offer:
+                new_offers.append(offer)
+                db_offer = Offer(subscriber.chat_id, offer['cpu'],
+                    offer['cpu_rating'], offer['ram'], offer['hd'],
+                    offer['price'], offer['next_reduction'])
+                session.add(db_offer)
+                session.commit()
+            else:
+                db_offer.last_update = datetime.datetime.now()
+
+            session.add(db_offer)
+
+        end_date = datetime.datetime.now() - datetime.timedelta(minutes=1)
+        session.query(Offer) \
+            .filter(Offer.chat_id == subscriber.chat_id) \
+            .filter(Offer.last_update < end_date) \
+            .delete()
+        session.commit()
+
+        if get_all:
+            formatted = self.format_offers(offers)
+        else:
+            formatted = self.format_offers(new_offers)
+
         if formatted:
             bot.sendMessage(
                 chat_id=subscriber.chat_id,
@@ -254,12 +289,13 @@ class Hetzner():
         """Format the found offers."""
         formatted_offers = []
         for offer in offers:
-            formatted = 'Cpu: {0} , Rating: {1}, Ram: {2}, HD: {3}, Price: {4}'.format(
+            formatted = 'Cpu: {0} , Rating: {1}, Ram: {2} GB, HD: {3}, Price: {4}, Next price lower: {5}'.format(
                 offer['cpu'],
                 offer['cpu_rating'],
                 offer['ram'],
                 offer['hd'],
                 offer['price'],
+                offer['next_reduction'],
             )
             formatted_offers.append(formatted)
         return '\n'.join(formatted_offers)
