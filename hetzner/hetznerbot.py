@@ -289,7 +289,7 @@ class Hetzner():
         """Format the found offers."""
         formatted_offers = []
         for offer in offers:
-            formatted = 'Cpu: {0} , Rating: {1}, Ram: {2} GB, HD: {3}, Price: {4}, Next price lower: {5}'.format(
+            formatted = 'Cpu: {0} , Rating: {1}, Ram: {2} GB, HD: {3}, Price: {4}, Next price reduction: {5}'.format(
                 offer['cpu'],
                 offer['cpu_rating'],
                 offer['ram'],
