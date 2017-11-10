@@ -3,6 +3,7 @@
 import datetime
 from bs4 import BeautifulSoup
 from requests import request
+from requests.exceptions import ConnectionError
 from hetzner.config import TELEGRAM_API_KEY
 from hetzner.db import get_session
 from hetzner.offer import Offer
@@ -33,7 +34,7 @@ class Hetzner():
 
         # Create jobs
         job_queue = self.updater.job_queue
-        job_queue.run_repeating(self.process_all, interval=600, first=0)
+        job_queue.run_repeating(self.process_all, interval=120, first=0)
 
         # Create handler
         help_handler = CommandHandler('help', self.help)
@@ -146,6 +147,8 @@ class Hetzner():
         session.add(subscriber)
         session.commit()
         session.close()
+        subscriber = session.query(Subscriber).get(subscriber.id)
+        self.process(bot, subscriber, session=session)
 
     def start(self, bot, update):
         """Start the bot."""
@@ -248,7 +251,11 @@ class Hetzner():
         offers = []
 
         url = "https://robot.your-server.de/order/market"
-        response = request('POST', url, data=data, headers=headers)
+        try:
+            response = request('POST', url, data=data, headers=headers)
+        except ConnectionError:
+            print("Got an ConnectionError during hetzner request")
+            return {}
         soup = BeautifulSoup(response.content, 'html.parser')
 
         # Find all items
