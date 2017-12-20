@@ -1,10 +1,11 @@
 """Helper class to get a database engine and to get a session."""
 from hetzner.config import SQL_URI
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine(SQL_URI)
+engine = create_engine(SQL_URI, poolclass=NullPool)
 base = declarative_base(bind=engine)
 
 
