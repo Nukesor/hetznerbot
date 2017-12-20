@@ -97,7 +97,7 @@ class Hetzner():
                 subscriber.ram,
                 subscriber.price,
             )
-        session.close()
+        session.remove()
         bot.sendMessage(chat_id=chat_id, text=formatted)
 
     def get(self, bot, update):
@@ -106,7 +106,7 @@ class Hetzner():
         subscriber = self.get_or_create_subscriber(
             session, update.message.chat_id)
         self.process(bot, subscriber, session=session, get_all=True)
-        session.close()
+        session.remove()
 
     def set(self, bot, update):
         """Set query attributes."""
@@ -146,7 +146,7 @@ class Hetzner():
         setattr(subscriber, field[0], field[1])
         session.add(subscriber)
         session.commit()
-        session.close()
+        session.remove()
         subscriber = session.query(Subscriber).get(subscriber.id)
         self.process(bot, subscriber, session=session)
 
@@ -159,7 +159,7 @@ class Hetzner():
         subscriber.active = True
         session.add(subscriber)
         session.commit()
-        session.close()
+        session.remove()
 
         text = 'You will now receive offers. Type /help for more info.'
         bot.sendMessage(chat_id=chat_id, text=text)
@@ -173,7 +173,7 @@ class Hetzner():
         subscriber.active = False
         session.add(subscriber)
         session.commit()
-        session.close()
+        session.remove()
 
         text = "You won't receive any more offers."
         bot.sendMessage(chat_id=chat_id, text=text)
@@ -186,7 +186,7 @@ class Hetzner():
             .all()
         for subscriber in subscribers:
             self.process(bot, subscriber, session=session)
-        session.close()
+        session.remove()
 
     def process(self, bot, subscriber, session, get_all=False):
         """Send the newest update to all subscribers."""
