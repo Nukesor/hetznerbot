@@ -1,6 +1,7 @@
 """The actual bot."""
 
 import datetime
+import telegram
 from bs4 import BeautifulSoup
 from requests import request
 from requests.exceptions import ConnectionError
@@ -22,6 +23,32 @@ attributes = [
     'price',
     'next_reduction',
 ]
+
+
+def is_int_or_float(string):
+    """Check if the string is an int or float."""
+    try:
+        int(string)
+        return True
+    except ValueError:
+        try:
+            float(string)
+            return True
+        except ValueError:
+            pass
+        pass
+
+    return False
+
+
+def int_or_float(string):
+    """Return int or float."""
+    try:
+        x = int(string)
+        return x
+    except ValueError:
+        x = float(string)
+        return x
 
 
 class Hetzner():
@@ -204,9 +231,11 @@ class Hetzner():
                 .one_or_none()
             if not db_offer:
                 new_offers.append(offer)
-                db_offer = Offer(subscriber.chat_id, offer['cpu'],
+                db_offer = Offer(
+                    subscriber.chat_id, offer['cpu'],
                     offer['cpu_rating'], offer['ram'], offer['hd'],
-                    offer['price'], offer['next_reduction'])
+                    offer['price'], offer['next_reduction']
+                )
                 session.add(db_offer)
                 session.commit()
             else:
@@ -227,10 +256,14 @@ class Hetzner():
             formatted = self.format_offers(new_offers)
 
         if formatted:
-            bot.sendMessage(
-                chat_id=subscriber.chat_id,
-                text=formatted,
-            )
+            try:
+                bot.sendMessage(
+                    chat_id=subscriber.chat_id,
+                    text=formatted,
+                )
+            except telegram.error.Unauthorized:
+                session.delete(subscriber)
+                session.commit()
 
     def get_hetzner_offers(self, subscriber):
         """Get the newest hetzner offers."""
@@ -272,7 +305,7 @@ class Hetzner():
             # Formatting
             offer['cpu_rating'] = int(offer['cpu_rating'])
             offer['ram'] = int(offer['ram'].split(' ')[0])
-            hd_details = [int(s) for s in offer['hd'].split() if s.isdigit()]
+            hd_details = [int_or_float(s) for s in offer['hd'].split() if is_int_or_float(s)]
             offer['hd_count'] = hd_details[0]
             offer['hd_size'] = hd_details[1]
 
