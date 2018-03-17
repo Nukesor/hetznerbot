@@ -91,6 +91,9 @@ class Hetzner():
         if there are any offers on the hetzner server market,
         that match your defined criteria.
 
+        If you encounter any bugs, create an issue over here:
+        https://github.com/Nukesor/hetznerbot
+
         Available commands:
         /start Start the bot
         /stop Start the bot
