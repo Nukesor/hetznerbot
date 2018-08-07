@@ -21,7 +21,7 @@ Available commands:
                 - `ram`         int (min RAM size in GB)
                 - `price`       int (max Price in Euro)
         /get Check hetzner now!
-        /info Get the current attributes.
+        /info Show the current search attributes.
         /help Show this text
 
 Feel free to host your own or to use mine: @hetzner_offer_bot

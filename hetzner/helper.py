@@ -10,11 +10,11 @@ attributes = [
     'next_reduction',
 ]
 
-help_text = """A nice little telegram bot, which texts you,
-if there are any offers on the hetzner server market,
-that match your defined criteria.
+help_text = """A handy telegram bot which texts you as soon as there is a viable offer available on the hetzner server market.
 
-If you encounter any bugs, create an issue over here:
+It is possible to set several search parameter which need to be satisfied for an offer to be sent to you.
+
+If you encounter any bugs, please create an issue over here:
 https://github.com/Nukesor/hetznerbot
 
 Available commands:
@@ -30,7 +30,7 @@ Available commands:
         - `ram`              int (min RAM size in GB)
         - `price`            int (max Price in Euro)
 /get Check hetzner now!
-/info Get the current attributes.
+/info Show the current search attributes.
 /help Show this text
 """
 
