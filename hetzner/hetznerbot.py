@@ -250,6 +250,7 @@ price: {9} Euro""".format(
             # Set the last update time and commit the offer it
             offer.last_update = datetime.datetime.now()
             session.add(offer)
+            session.commit()
 
         # Remove old offers.
         clean_threshold = datetime.datetime.now() - datetime.timedelta(minutes=5)
