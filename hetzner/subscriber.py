@@ -17,6 +17,9 @@ class Subscriber(base):
     raid = Column(String(10), default='raid5')
     after_raid = Column(Integer(), nullable=False, default=4)
     ram = Column(Integer(), nullable=False, default=16)
+    ecc = Column(Boolean(), nullable=False, default=False)
+    inic = Column(Boolean(), nullable=False, default=False)
+    hwr = Column(Boolean(), nullable=False, default=False)
     price = Column(Integer(), nullable=False, default=40)
 
     def __init__(self, chat_id):

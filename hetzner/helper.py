@@ -1,15 +1,6 @@
 """Some static stuff or helper functions for hetzner bot."""
 
 
-attributes = [
-    'cpu',
-    'cpu_rating',
-    'ram',
-    'hd',
-    'price',
-    'next_reduction',
-]
-
 help_text = """A handy telegram bot which texts you as soon as there is a viable offer available on the hetzner server market.
 
 It is possible to set several search parameter which need to be satisfied for an offer to be sent to you.
@@ -28,6 +19,9 @@ Available commands:
         - `after_raid`   int (min size of raid after assembly in TB)
         - `cpu_rating`  int (min cpu rating)
         - `ram`              int (min RAM size in GB)
+        - `inic [0,1]`  bool (1 if the offer has to have an iNIC)
+        - `ecc [0,1]`     bool (1 if the offer has to have ECC RAM)
+        - `hwr [0,1]`     bool (1 if the offer has to have a HWR)
         - `price`            int (max Price in Euro)
 /get Check hetzner now!
 /info Show the current search attributes.
@@ -57,5 +51,5 @@ def int_or_float(string):
         x = int(string)
         return x
     except ValueError:
-        x = float(string)
+        x = float(string.replace(',', '.'))
         return x
