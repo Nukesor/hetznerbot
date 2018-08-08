@@ -324,6 +324,7 @@ price: {9} Euro""".format(
             # Create an offer of each item.
             offer = Offer(subscriber.chat_id)
             offer_data = {}
+            extra_features = ''
 
             details = item.table.tr.find_all('td')
             for key, detail in enumerate(details):
