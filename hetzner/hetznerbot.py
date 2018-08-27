@@ -66,7 +66,7 @@ class Hetzner():
         session = get_session()
         try:
             chat_id = update.message.chat_id
-            subscriber = self.get_or_create_subscriber(session, chat_id)
+            subscriber = Subscriber.get_or_create(session, chat_id)
 
             formatted = """hd_count: {0}
 hd_size: {1} GB
@@ -99,8 +99,7 @@ price: {9} Euro""".format(
         """Get the newest hetzner offers."""
         session = get_session()
         try:
-            subscriber = self.get_or_create_subscriber(
-                session, update.message.chat_id)
+            subscriber = Subscriber.get_or_create(session, update.message.chat_id)
             self.process(bot, subscriber, session=session, get_all=True)
         except BaseException as e:
             traceback.print_exc()
@@ -112,8 +111,7 @@ price: {9} Euro""".format(
         session = get_session()
         try:
             chat_id = update.message.chat_id
-            subscriber = self.get_or_create_subscriber(
-                session, chat_id)
+            subscriber = Subscriber.get_or_create(session, chat_id)
 
             text = update.message.text
             parameters = text.split(' ')[1:]
@@ -180,7 +178,7 @@ price: {9} Euro""".format(
         try:
             chat_id = update.message.chat_id
 
-            subscriber = self.get_or_create_subscriber(session, chat_id)
+            subscriber = Subscriber.get_or_create(session, chat_id)
             subscriber.active = True
             session.add(subscriber)
             session.commit()
@@ -198,7 +196,7 @@ price: {9} Euro""".format(
         try:
             chat_id = update.message.chat_id
 
-            subscriber = self.get_or_create_subscriber(session, chat_id)
+            subscriber = Subscriber.get_or_create(session, chat_id)
             subscriber.active = False
             session.add(subscriber)
             session.commit()
@@ -417,14 +415,3 @@ Next price reduction: {9}""".format(
             )
             formatted_offers += formatted_offer
         return formatted_offers
-
-    def get_or_create_subscriber(self, session, chat_id):
-        """Get or create a new subscriber."""
-        subscriber = session.query(Subscriber).get(chat_id)
-        if not subscriber:
-            subscriber = Subscriber(chat_id)
-            session.add(subscriber)
-            session.commit()
-            subscriber = session.query(Subscriber).get(chat_id)
-
-        return subscriber

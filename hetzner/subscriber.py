@@ -9,12 +9,12 @@ class Subscriber(base):
 
     __tablename__ = 'subscriber'
 
-    chat_id = Column(String(100), primary_key=True)
+    chat_id = Column(String(), primary_key=True)
     active = Column(Boolean(), nullable=False, default=True)
     hd_count = Column(Integer(), nullable=False, default=3)
     cpu_rating = Column(Integer(), nullable=False, default=8500)
     hd_size = Column(Integer(), nullable=False, default=2048)
-    raid = Column(String(10), default='raid5')
+    raid = Column(String(), default='raid5')
     after_raid = Column(Integer(), nullable=False, default=4)
     ram = Column(Integer(), nullable=False, default=16)
     ecc = Column(Boolean(), nullable=False, default=False)
@@ -25,3 +25,15 @@ class Subscriber(base):
     def __init__(self, chat_id):
         """Create a new subscriber."""
         self.chat_id = chat_id
+
+    @staticmethod
+    def get_or_create(session, chat_id):
+        """Get or create a new subscriber."""
+        subscriber = session.query(Subscriber).get(chat_id)
+        if not subscriber:
+            subscriber = Subscriber(chat_id)
+            session.add(subscriber)
+            session.commit()
+            subscriber = session.query(Subscriber).get(chat_id)
+
+        return subscriber

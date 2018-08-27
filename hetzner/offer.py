@@ -14,8 +14,8 @@ class Offer(base):
     )
 
     id = Column(Integer(), primary_key=True)
-    chat_id = Column(String(100), nullable=True)
-    cpu = Column(String(100), nullable=False)
+    chat_id = Column(String(), nullable=True)
+    cpu = Column(String(), nullable=False)
     cpu_rating = Column(Integer(), nullable=False)
     ram = Column(Integer(), nullable=False)
     hd_count = Column(Integer(), nullable=False)
