@@ -7,9 +7,10 @@ import telegram
 from bs4 import BeautifulSoup
 from requests import request
 from requests.exceptions import ConnectionError
-from hetzner.config import TELEGRAM_API_KEY
+from hetzner.config import config
 from hetzner.db import get_session
 from hetzner.offer import Offer
+from hetzner.sentry import Sentry
 from hetzner.subscriber import Subscriber
 from hetzner.helper import (
     help_text,
@@ -28,7 +29,11 @@ class Hetzner():
 
     def __init__(self):
         """Initialize telegram bot and all needed variables."""
-        self.updater = Updater(token=TELEGRAM_API_KEY)
+        # Initialize sentry
+        self.sentry = Sentry()
+
+        # Initialize telegram updater and dispatcher
+        self.updater = Updater(token=config.TELEGRAM_API_KEY)
         dispatcher = self.updater.dispatcher
 
         # Create jobs
