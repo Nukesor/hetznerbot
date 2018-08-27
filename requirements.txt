@@ -5,6 +5,9 @@ SQLAlchemy~=1.2
 sqlalchemy-utils~=0.33
 dateparser~=0.7.0
 
+# Logging
+raven
+
 # Linting
 flake8
 flake8-docstrings
