@@ -1,6 +1,6 @@
 """Some static stuff or helper functions for hetzner bot."""
 import traceback
-from functools import wraps, partial
+from functools import wraps
 
 from hetzner.db import get_session
 from hetzner.sentry import sentry
