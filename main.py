@@ -1,7 +1,7 @@
 #!/bin/env python
 """Start the bot."""
 
-from hetzner.hetznerbot import Hetzner
+from hetzner.hetznerbot import updater
 
-bot = Hetzner()
-bot.main()
+updater.start_polling()
+updater.idle()

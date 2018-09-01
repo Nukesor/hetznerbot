@@ -4,6 +4,7 @@
 from sqlalchemy_utils.functions import database_exists, create_database, drop_database
 from hetzner.db import engine, base
 from hetzner.subscriber import Subscriber # noqa
+from hetzner.offer import Offer # noqa
 
 
 db_url = engine.url
