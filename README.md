@@ -1,9 +1,11 @@
 # Hetzner-Bot
 
 A handy telegram bot which texts you as soon as there is a viable offer available on the hetzner server market.
-It is possible to set several search parameter which need to be satisfied for an offer being sent to you.
+It is possible to set several search parameter which need to be satisfied for an offer to be sent to you.
 
-![Pueue](https://raw.githubusercontent.com/Nukesor/images/master/hetzner_bot_reply.png)
+<p align="center">
+    <img src="https://raw.githubusercontent.com/Nukesor/images/master/hetzner_bot_reply.png">
+</p>
 
 If the price of an offer is reduced you will get a new notification with the updated price.
 
