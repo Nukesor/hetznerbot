@@ -6,8 +6,8 @@ from bs4 import BeautifulSoup
 from requests import request
 from requests.exceptions import ConnectionError
 
-from hetzner.offer import Offer
-from hetzner.helper import (
+from hetznerbot.offer import Offer
+from hetznerbot.helper import (
     is_int_or_float,
     int_or_float,
 )

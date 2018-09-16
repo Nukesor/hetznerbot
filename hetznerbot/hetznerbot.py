@@ -1,12 +1,12 @@
 """A bot which checks if there is a new record in the server section of hetzner."""
-from hetzner.config import config
-from hetzner.subscriber import Subscriber
-from hetzner.helper import (
+from hetznerbot.config import config
+from hetznerbot.subscriber import Subscriber
+from hetznerbot.helper import (
     help_text,
     session_wrapper,
     get_subscriber_info,
 )
-from hetzner.hetzner_helper import process
+from hetznerbot.hetzner_helper import process
 
 from telegram.ext import (
     CommandHandler,

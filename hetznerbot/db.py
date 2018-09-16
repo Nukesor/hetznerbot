@@ -1,5 +1,5 @@
 """Helper class to get a database engine and to get a session."""
-from hetzner.config import config
+from hetznerbot.config import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker

@@ -1,6 +1,6 @@
 """Simple wrapper around sentry that allows for lazy initilization."""
 from raven import Client
-from hetzner.config import config
+from hetznerbot.config import config
 
 
 class Sentry(object):

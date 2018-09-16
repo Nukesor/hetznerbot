@@ -1,5 +1,5 @@
 """The sqlite model for a subscriber."""
-from hetzner.db import base
+from hetznerbot.db import base
 
 from sqlalchemy import Column, String, Integer, Boolean
 

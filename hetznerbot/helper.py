@@ -2,8 +2,8 @@
 import traceback
 from functools import wraps
 
-from hetzner.db import get_session
-from hetzner.sentry import sentry
+from hetznerbot.db import get_session
+from hetznerbot.sentry import sentry
 
 
 help_text = """A handy telegram bot which texts you as soon as there is a viable offer available on the hetzner server market.
