@@ -5,6 +5,7 @@ import dateparser
 from requests import request
 from requests.exceptions import ConnectionError
 
+from hetznerbot.helper.text import split_text
 from hetznerbot.models import (
     Offer,
     OfferSubscriber,
@@ -151,39 +152,6 @@ def check_offer_for_subscriber(session, subscriber, offers):
     session.commit()
 
 
-def send_offers(bot, subscriber, session, get_all=False):
-    """Send the newest update to all subscribers."""
-    # Extract message meta data
-    if get_all:
-        formatted = format_offers(subscriber.offer_subscriber, get_all=True)
-    else:
-        formatted = format_offers(subscriber.offer_subscriber)
-
-    if formatted:
-        try:
-            bot.sendMessage(
-                chat_id=subscriber.chat_id,
-                text=formatted,
-            )
-        except telegram.error.BadRequest as e:
-            if e.message == 'Message is too long':
-                bot.sendMessage(
-                    chat_id=subscriber.chat_id,
-                    text='Too many results, please narrow down your search a little.',
-                )
-            else:
-                raise e
-        except telegram.error.Unauthorized:
-            session.delete(subscriber)
-            session.commit()
-    else:
-        if get_all:
-            bot.sendMessage(
-                chat_id=subscriber.chat_id,
-                text='There are currently no offers for your criteria.',
-            )
-
-
 def format_offers(offer_subscriber, get_all=False):
     """Format the found offers."""
     # Filter all offers, which aren't notified yet, if the user doesn't want all offers.
@@ -194,9 +162,9 @@ def format_offers(offer_subscriber, get_all=False):
         offer_subscriber = list(filter(not_notified, offer_subscriber))
 
     if len(offer_subscriber) == 0:
-        return None
+        return []
 
-    formatted_offers = 'All offers:' if get_all else 'New offers:'
+    formatted_offers = ['All offers:' if get_all else 'New offers:']
     for i, offer_subscriber in enumerate(offer_subscriber):
         # The subscriber should only receive new offers
         offer_subscriber.notified = True
@@ -219,7 +187,7 @@ def format_offers(offer_subscriber, get_all=False):
         if extra_features == '':
             extra_features = 'None'
 
-        formatted_offer = """\n\nOffer {0}
+        formatted_offer = """Offer {0}
 Cpu: {1} with rating {2}
 Ram: {3} GB
 HD: {4} drives with {5} GB Capacity ({6}GB total)
@@ -237,6 +205,40 @@ Next price reduction: {9}""".format(
             offer.price,
             next_reduction,
         )
-        formatted_offers += formatted_offer
+        formatted_offers.append(formatted_offer)
+
+    formatted_offers = split_text(formatted_offers, max_chunks=5)
 
     return formatted_offers
+
+
+def send_offers(bot, subscriber, session, get_all=False):
+    """Send the newest update to all subscribers."""
+    # Extract message meta data
+    if get_all:
+        formatted_offers = format_offers(subscriber.offer_subscriber, get_all=True)
+    else:
+        formatted_offers = format_offers(subscriber.offer_subscriber)
+
+    if len(formatted_offers) > 0:
+        for chunk in formatted_offers:
+            try:
+                bot.sendMessage(
+                    chat_id=subscriber.chat_id,
+                    text=chunk,
+                )
+            except telegram.error.Unauthorized:
+                session.delete(subscriber)
+                session.commit()
+
+        if formatted_offers == 5:
+            bot.sendMessage(
+                chat_id=subscriber.chat_id,
+                text='Too many results, please narrow down your search a little.',
+            )
+    else:
+        if get_all:
+            bot.sendMessage(
+                chat_id=subscriber.chat_id,
+                text='There are currently no offers for your criteria.',
+            )
