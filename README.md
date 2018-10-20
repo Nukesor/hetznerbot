@@ -13,10 +13,10 @@ Available commands:
 
         /start Start the bot
         /stop Stop the bot
-        /set Set search attributes with this syntax: "\set hd_count 3"
+        /set Set search attributes with this syntax: "\set hdd_count 3"
             Attributes are:
-                - `hd_count`    int (min number of hard drives)
-                - `hd_size`     int (min amount of GB for each disk)
+                - `hdd_count`    int (min number of hard drives)
+                - `hdd_size`     int (min amount of GB for each disk)
                 - `raid`        enum ('raid5', 'raid6', 'None')
                 - `after_raid`  int (min size of raid after assembly in TB)
                 - `cpu_rating`  int (min cpu rating)

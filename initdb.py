@@ -3,8 +3,7 @@
 
 from sqlalchemy_utils.functions import database_exists, create_database, drop_database
 from hetznerbot.db import engine, base
-from hetznerbot.subscriber import Subscriber # noqa
-from hetznerbot.offer import Offer # noqa
+from hetznerbot.models import * # noqa
 
 
 db_url = engine.url

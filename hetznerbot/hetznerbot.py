@@ -1,24 +1,33 @@
 """A bot which checks if there is a new record in the server section of hetzner."""
-from hetznerbot.config import config
-from hetznerbot.subscriber import Subscriber
-from hetznerbot.helper import (
-    help_text,
-    session_wrapper,
-    get_subscriber_info,
-)
-from hetznerbot.hetzner_helper import process
-
+from telegram.ext import run_async
 from telegram.ext import (
     CommandHandler,
     Updater,
 )
 
+from hetznerbot.config import config
+from hetznerbot.models import Subscriber
+from hetznerbot.helper import (
+    help_text,
+    session_wrapper,
+    get_subscriber_info,
+)
+from hetznerbot.helper.hetzner import (
+    send_offers,
+    update_offers,
+    get_hetzner_offers,
+    check_offers_for_subscribers,
+    check_all_offers_for_subscriber,
+)
 
+
+@run_async
 def send_help_text(bot, update):
     """Send a help text."""
     bot.sendMessage(chat_id=update.message.chat_id, text=help_text)
 
 
+@run_async
 @session_wrapper()
 def info(bot, update, session):
     """Get the newest hetzner offers."""
@@ -32,9 +41,12 @@ def info(bot, update, session):
 def get_offers(bot, update, session):
     """Get the newest hetzner offers."""
     subscriber = Subscriber.get_or_create(session, update.message.chat_id)
-    process(bot, subscriber, session=session, get_all=True)
+
+    check_all_offers_for_subscriber(session, subscriber)
+    send_offers(bot, subscriber, session, get_all=True)
 
 
+@run_async
 @session_wrapper()
 def set_parameter(bot, update, session):
     """Set query attributes."""
@@ -44,7 +56,7 @@ def set_parameter(bot, update, session):
     text = update.message.text
     parameters = text.split(' ')[1:]
 
-    parameter_names = ['hd_count', 'hd_size', 'raid', 'after_raid',
+    parameter_names = ['hdd_count', 'hdd_size', 'raid', 'after_raid',
                        'cpu_rating', 'ram', 'price', 'ecc', 'inic', 'hwr']
 
     # We need exactly two parameter. Name and value
@@ -67,10 +79,10 @@ def set_parameter(bot, update, session):
             else:
                 bot.sendMessage(chat_id=chat_id, text='Invalid value for "raid". Type /help for more information')
                 return
-        elif value == 'raid5' == subscriber.hd_count < 3 \
-                or value == 'raid6' == subscriber.hd_count < 4:
+        elif value == 'raid5' == subscriber.hdd_count < 3 \
+                or value == 'raid6' == subscriber.hdd_count < 4:
             bot.sendMessage(chat_id=chat_id,
-                            text='Invalid raid type for current hd_count. RAID5 needs at least 3 drives, RAID6 needs at least 4 drives')
+                            text='Invalid raid type for current hdd_count. RAID5 needs at least 3 drives, RAID6 needs at least 4 drives')
     # Validate int values
     else:
         try:
@@ -94,9 +106,11 @@ def set_parameter(bot, update, session):
     session.add(subscriber)
     session.commit()
 
-    process(bot, subscriber, session=session)
+    check_all_offers_for_subscriber(session, subscriber)
+    send_offers(bot, subscriber, session)
 
 
+@run_async
 @session_wrapper()
 def start(bot, update, session):
     """Start the bot."""
@@ -107,10 +121,15 @@ def start(bot, update, session):
     session.add(subscriber)
     session.commit()
 
+    bot.sendMessage(chat_id=update.message.chat_id, text=help_text)
     text = 'You will now receive offers. Type /help for more info.'
     bot.sendMessage(chat_id=chat_id, text=text)
 
+    check_all_offers_for_subscriber(session, subscriber)
+    send_offers(bot, subscriber, session)
 
+
+@run_async
 @session_wrapper()
 def stop(bot, update, session):
     """Stop the bot."""
@@ -128,11 +147,15 @@ def stop(bot, update, session):
 @session_wrapper(send_message=False)
 def process_all(bot, job, session):
     """Check for every subscriber."""
+    incoming_offers = get_hetzner_offers()
+    offers = update_offers(session, incoming_offers)
+    check_offers_for_subscribers(session, offers)
+
     subscribers = session.query(Subscriber) \
-        .filter(Subscriber.active == True) \
+        .filter(Subscriber.active.is_(True)) \
         .all()
     for subscriber in subscribers:
-        process(bot, subscriber, session=session)
+        send_offers(bot, subscriber, session)
 
 
 # Initialize telegram updater and dispatcher

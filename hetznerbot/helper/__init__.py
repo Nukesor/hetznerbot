@@ -16,12 +16,12 @@ https://github.com/Nukesor/hetznerbot
 Available commands:
 /start Start the bot
 /stop Stop the bot
-/set Set attributes with this syntax: "\set hd_count 3"
+/set Set attributes with this syntax: "\set hdd_count 3"
     Attributes are:
-        - `hd_count`    int (min number of hard drives)
-        - `hd_size`       int (min amount of GB for each disk)
+        - `hdd_count`    int (min number of hard drives)
+        - `hdd_size`       int (min amount of GB for each disk)
         - `raid`             enum ('raid5', 'raid6', 'None')
-        - `after_raid`   int (min size of raid after assembly in TB)
+        - `after_raid`   int (min size of raid after assembly in GB)
         - `cpu_rating`  int (min cpu rating)
         - `ram`              int (min RAM size in GB)
         - `inic [0,1]`  bool (1 if the offer has to have an iNIC)
@@ -36,18 +36,18 @@ Available commands:
 
 def get_subscriber_info(subscriber):
     """Return the formatted information about the current subscriber."""
-    return """hd_count: {0}
-hd_size: {1} GB
+    return """hdd_count: {0}
+hdd_size: {1} GB
 raid: {2}
-after_raid: {3} TB
+after_raid: {3} GB
 cpu_rating: {4}
 ecc: {5}
 inic: {6}
 hwr: {7}
 ram: {8} GB
 price: {9} Euro""".format(
-            subscriber.hd_count,
-            subscriber.hd_size,
+            subscriber.hdd_count,
+            subscriber.hdd_size,
             subscriber.raid,
             subscriber.after_raid,
             subscriber.cpu_rating,
@@ -68,6 +68,7 @@ def session_wrapper(send_message=True):
             session = get_session()
             try:
                 func(bot, update, session)
+                session.commit()
             except BaseException as e:
                 if send_message:
                     bot.sendMessage(
