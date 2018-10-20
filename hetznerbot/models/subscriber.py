@@ -22,7 +22,7 @@ class Subscriber(base):
     hdd_count = Column(Integer, nullable=False, default=3)
     hdd_size = Column(Integer, nullable=False, default=2048)
     raid = Column(String, default='raid5')
-    after_raid = Column(Integer, nullable=False, default=4)
+    after_raid = Column(Integer, nullable=False, default=4096)
 
     price = Column(Integer, nullable=False, default=40)
     cpu_rating = Column(Integer, nullable=False, default=8500)
