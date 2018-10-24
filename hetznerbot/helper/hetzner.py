@@ -5,6 +5,7 @@ import dateparser
 from requests import request
 from requests.exceptions import ConnectionError
 
+from hetznerbot.sentry import sentry
 from hetznerbot.helper.text import split_text
 from hetznerbot.models import (
     Offer,
@@ -28,6 +29,8 @@ def get_hetzner_offers():
         data = json.loads(response.content)
     except ConnectionError:
         print('Connection error while retrieving data.')
+        sentry.captureMessage('Connection error while retrieving data.')
+        return None
 
     return data['server']
 

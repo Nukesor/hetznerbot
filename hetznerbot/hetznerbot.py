@@ -147,7 +147,11 @@ def stop(bot, update, session):
 @session_wrapper(send_message=False)
 def process_all(bot, job, session):
     """Check for every subscriber."""
+    # Get hetzner offers. Early return if it doesn't work
     incoming_offers = get_hetzner_offers()
+    if incoming_offers is None:
+        return
+
     offers = update_offers(session, incoming_offers)
     check_offers_for_subscribers(session, offers)
 
