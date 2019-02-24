@@ -87,7 +87,7 @@ def set_parameter(bot, update, session):
     else:
         try:
             value = int(value)
-        except BaseException as e:
+        except BaseException:
             bot.sendMessage(
                 chat_id=chat_id,
                 text='Value is not an int.',

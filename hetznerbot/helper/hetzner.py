@@ -117,15 +117,13 @@ def check_offer_for_subscriber(session, subscriber, offers):
             after_raid = (offer.hdd_count - 1) * offer.hdd_size
         elif subscriber.raid == 'raid6':
             after_raid = (offer.hdd_count - 2) * offer.hdd_size
-        elif subscriber.raid is None:
-            after_raid = 100000000
 
         if offer.price > subscriber.price \
                 or offer.cpu_rating < subscriber.cpu_rating \
                 or offer.ram < subscriber.ram \
                 or offer.hdd_count < subscriber.hdd_count \
                 or offer.hdd_size < subscriber.hdd_size \
-                or after_raid < subscriber.after_raid \
+                or (subscriber.raid is not None and after_raid < subscriber.after_raid) \
                 or (subscriber.ecc and not offer.ecc)\
                 or (subscriber.inic and not offer.inic)\
                 or (subscriber.hwr and not offer.hwr):
