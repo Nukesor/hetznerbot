@@ -39,7 +39,7 @@ Now copy the `hetzner/config.example.py` to `hetzner/config.py` and adjust all n
 Finally execute following commands to install all dependencies and to start the bot:
 
     % make
-    % ./venv/bin/activate
+    % source ./venv/bin/activate
     % ./initdb.py
     % ./main.py
 
