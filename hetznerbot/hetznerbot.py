@@ -10,6 +10,7 @@ from hetznerbot.models import Subscriber
 from hetznerbot.helper import (
     help_text,
     session_wrapper,
+    job_session_wrapper,
     get_subscriber_info,
 )
 from hetznerbot.helper.hetzner import (
@@ -144,8 +145,8 @@ def stop(bot, update, session):
     bot.sendMessage(chat_id=chat_id, text=text)
 
 
-@session_wrapper(send_message=False)
-def process_all(bot, job, session):
+@job_session_wrapper()
+def process_all(context, session):
     """Check for every subscriber."""
     # Get hetzner offers. Early return if it doesn't work
     incoming_offers = get_hetzner_offers()
@@ -159,13 +160,14 @@ def process_all(bot, job, session):
         .filter(Subscriber.active.is_(True)) \
         .all()
     for subscriber in subscribers:
-        send_offers(bot, subscriber, session)
+        send_offers(context.bot, subscriber, session)
 
 
 # Initialize telegram updater and dispatcher
 updater = Updater(
     token=config['telegram']['api_key'],
     workers=config['telegram']['worker_count'],
+    use_context=True,
 )
 dispatcher = updater.dispatcher
 
