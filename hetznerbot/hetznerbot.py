@@ -9,9 +9,11 @@ from hetznerbot.config import config
 from hetznerbot.models import Subscriber
 from hetznerbot.helper import (
     help_text,
+    get_subscriber_info,
+)
+from hetznerbot.helper.session import (
     session_wrapper,
     job_session_wrapper,
-    get_subscriber_info,
 )
 from hetznerbot.helper.hetzner import (
     send_offers,
