@@ -163,7 +163,10 @@ def process_all(bot, job, session):
 
 
 # Initialize telegram updater and dispatcher
-updater = Updater(token=config.TELEGRAM_API_KEY)
+updater = Updater(
+    token=config['telegram']['api_key'],
+    workers=config['telegram']['worker_count'],
+)
 dispatcher = updater.dispatcher
 
 # Create jobs

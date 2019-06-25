@@ -1,0 +1,17 @@
+[telegram]
+api_key = "your_telegram_api_key"
+worker_count = 5
+
+[database]
+sql_uri = "sqlite:///hetznerbot.db"
+
+[logging]
+sentry_enabled = false
+sentry_token = ""
+
+[webhook]
+enabled = false
+domain = "https://localhost"
+token = "hetznerbot"
+cert_path = "/path/to/cert.pem"
+port = 7000

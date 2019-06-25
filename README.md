@@ -22,6 +22,9 @@ Available commands:
                 - `cpu_rating`  int (min cpu rating)
                 - `ram`         int (min RAM size in GB)
                 - `price`       int (max Price in Euro)
+                - `ecc`         bool (0 or 1)
+                - `inic`        bool (0 or 1)
+                - `hwr`         bool (0 or 1)
         /get Check hetzner now!
         /info Show the current search attributes.
         /help Show this text
@@ -30,16 +33,22 @@ Feel free to host your own or to use mine: @hetzner_offer_bot
 
 
 ## Installation and starting:
+**This bot is developed for Linux.**
 
-Clone the repository: 
+Windows isn't tested, but it shouldn't be too hard to make it compatible. Feel free to create a PR.
 
-    % git clone git@github.com:nukesor/hetznerbot && cd hetzner
+Dependencies: 
+- `poetry` to manage and install dependencies.
+- Hetznerbot uses sqlite by default
 
-Now copy the `hetzner/config.example.py` to `hetzner/config.py` and adjust all necessary values.
-Finally execute following commands to install all dependencies and to start the bot:
+1. Clone the repository: 
 
-    % make
-    % source ./venv/bin/activate
-    % ./initdb.py
-    % ./main.py
+        % git clone git@github.com:nukesor/hetznerbot && cd hetznerbot
 
+2. Execute following commands to install all dependencies and to initialize the database:
+
+        % poetry install
+        % poetry run initdb.py
+
+3. Either start hetznerbot once or copy the `hetznerbot.toml` manually to `~/.config/hetznerbot.toml` and adjust all necessary values.
+4. Start the bot: `poetry run main.py`
