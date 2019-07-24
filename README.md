@@ -52,3 +52,12 @@ Dependencies:
 
 3. Either start hetznerbot once or copy the `hetznerbot.toml` manually to `~/.config/hetznerbot.toml` and adjust all necessary values.
 4. Start the bot: `poetry run main.py`
+
+
+# Bot commands
+
+start - Start the bot
+stop - Stop the bot
+get - Get the newest Offers
+info - Show the current search attributes
+help - Show the help text
