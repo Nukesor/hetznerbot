@@ -25,7 +25,8 @@ from hetznerbot.helper.hetzner import (
 
 
 @run_async
-def send_help_text(bot, update):
+@session_wrapper()
+def send_help_text(bot, update, session):
     """Send a help text."""
     bot.sendMessage(chat_id=update.message.chat_id, text=help_text)
 
