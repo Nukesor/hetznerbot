@@ -97,7 +97,7 @@ def set_parameter(bot, update, session):
     elif name == 'datacenter':
         datacenters = ['NBG', 'FSN', 'HEL', 'None']
         if value not in datacenters:
-            chat.send_message(f'Invalid value for "raid". Please send one of these: {datacenters}')
+            chat.send_message(f'Invalid value for "datacenter". Please send one of these: {datacenters}')
             return
 
         # None value
@@ -124,7 +124,7 @@ def set_parameter(bot, update, session):
     session.add(subscriber)
     session.commit()
 
-    chat.send_message(f'{name} changed to {value}')
+    chat.send_message(f'"{name}" changed to {value}')
 
     check_all_offers_for_subscriber(session, subscriber)
     send_offers(bot, subscriber, session)
