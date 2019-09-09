@@ -1,9 +1,10 @@
 """A bot which checks if there is a new record in the server section of hetzner."""
-from telegram.ext import run_async
 from telegram.ext import (
+    run_async,
     CommandHandler,
     Updater,
 )
+from telegram.error import BadRequest
 
 from hetznerbot.config import config
 from hetznerbot.models import Subscriber
@@ -28,7 +29,7 @@ from hetznerbot.helper.hetzner import (
 @session_wrapper()
 def send_help_text(bot, update, session):
     """Send a help text."""
-    bot.sendMessage(chat_id=update.message.chat_id, text=help_text)
+    bot.send_message(chat_id=update.message.chat_id, text=help_text)
 
 
 @run_async
@@ -38,7 +39,7 @@ def info(bot, update, session):
     chat_id = update.message.chat_id
     subscriber = Subscriber.get_or_create(session, chat_id)
 
-    bot.sendMessage(chat_id=chat_id, text=get_subscriber_info(subscriber))
+    bot.send_message(chat_id=chat_id, text=get_subscriber_info(subscriber))
 
 
 @session_wrapper()
@@ -56,59 +57,74 @@ def set_parameter(bot, update, session):
     """Set query attributes."""
     chat_id = update.message.chat_id
     subscriber = Subscriber.get_or_create(session, chat_id)
+    chat = update.message.chat
 
     text = update.message.text
     parameters = text.split(' ')[1:]
 
-    parameter_names = ['hdd_count', 'hdd_size', 'raid', 'after_raid',
+    parameter_names = ['hdd_count', 'hdd_size', 'raid', 'after_raid', 'datacenter',
                        'cpu_rating', 'ram', 'price', 'ecc', 'inic', 'hwr']
 
     # We need exactly two parameter. Name and value
     if len(parameters) != 2:
-        bot.sendMessage(chat_id=chat_id, text='Exactly two parameter need to be specified.')
+        chat.send_message('Exactly two parameter need to be specified.')
         return
 
     [name, value] = parameters
 
     # Check if we know this parameter
     if name not in parameter_names:
-        bot.sendMessage(chat_id=chat_id, text='Invalid parameter. Type /help for more information')
+        chat.send_message('Invalid parameter. Type /help for more information')
         return
 
     # validate raid choices
     if name == 'raid':
-        if value not in ['raid5', 'raid6']:
-            if value == 'None':
-                value = None
-            else:
-                bot.sendMessage(chat_id=chat_id, text='Invalid value for "raid". Type /help for more information')
-                return
-        elif value == 'raid5' == subscriber.hdd_count < 3 \
+        if value not in ['raid5', 'raid6', 'None']:
+            chat.send_message('Invalid value for "raid". Type /help for more information')
+            return
+
+        # Check if raid is possible with hdd_count
+        if value == 'raid5' == subscriber.hdd_count < 3 \
                 or value == 'raid6' == subscriber.hdd_count < 4:
-            bot.sendMessage(chat_id=chat_id,
-                            text='Invalid raid type for current hdd_count. RAID5 needs at least 3 drives, RAID6 needs at least 4 drives')
+            chat.send_message(
+                'Invalid raid type for current hdd_count. RAID5 needs at least 3 drives, RAID6 needs at least 4 drives')
+            return
+
+        # No raid
+        if value == 'None':
+            value = None
+
+    elif name == 'datacenter':
+        datacenters = ['NBG', 'FSN', 'HEL', 'None']
+        if value not in datacenters:
+            chat.send_message(f'Invalid value for "raid". Please send one of these: {datacenters}')
+            return
+
+        # None value
+        if value == 'None':
+            value = None
+
     # Validate int values
     else:
         try:
             value = int(value)
         except BaseException:
-            bot.sendMessage(
-                chat_id=chat_id,
-                text='Value is not an int.',
-            )
+            chat.send_message('Value is not an int.')
             return
 
     # Validate boolean values
     if name in ['ecc', 'inic', 'hwr']:
         if value not in [0, 1]:
-            bot.sendMessage(chat_id=chat_id, text='The value needs to be a boolean (0 or 1)')
+            chat.send_message('The value needs to be a boolean (0 or 1)')
             return
 
-        setattr(subscriber, name, bool(value))
+        value = bool(value)
 
     setattr(subscriber, name, value)
     session.add(subscriber)
     session.commit()
+
+    chat.send_message(f'{name} changed to {value}')
 
     check_all_offers_for_subscriber(session, subscriber)
     send_offers(bot, subscriber, session)
@@ -125,9 +141,9 @@ def start(bot, update, session):
     session.add(subscriber)
     session.commit()
 
-    bot.sendMessage(chat_id=update.message.chat_id, text=help_text)
+    bot.send_message(chat_id=update.message.chat_id, text=help_text)
     text = 'You will now receive offers. Type /help for more info.'
-    bot.sendMessage(chat_id=chat_id, text=text)
+    bot.send_message(chat_id=chat_id, text=text)
 
     check_all_offers_for_subscriber(session, subscriber)
     send_offers(bot, subscriber, session)
@@ -145,7 +161,7 @@ def stop(bot, update, session):
     session.commit()
 
     text = "You won't receive any more offers."
-    bot.sendMessage(chat_id=chat_id, text=text)
+    bot.send_message(chat_id=chat_id, text=text)
 
 
 @job_session_wrapper()
@@ -163,7 +179,14 @@ def process_all(context, session):
         .filter(Subscriber.active.is_(True)) \
         .all()
     for subscriber in subscribers:
-        send_offers(context.bot, subscriber, session)
+        try:
+            send_offers(context.bot, subscriber, session)
+        except BadRequest as e:
+            if e.message == 'Chat not found':
+                session.delete(subscriber)
+        # Bot was removed from group
+        except Unauthorized:
+            session.delete(subscriber)
 
 
 # Initialize telegram updater and dispatcher

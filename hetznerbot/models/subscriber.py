@@ -27,6 +27,7 @@ class Subscriber(base):
     price = Column(Integer, nullable=False, default=40)
     cpu_rating = Column(Integer, nullable=False, default=8500)
     ram = Column(Integer, nullable=False, default=16)
+    datacenter = Column(String, nullable=True)
 
     ecc = Column(Boolean, nullable=False, default=False)
     inic = Column(Boolean, nullable=False, default=False)

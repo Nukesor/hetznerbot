@@ -24,6 +24,7 @@ class Offer(base):
     cpu = Column(String, nullable=False)
     cpu_rating = Column(Integer, nullable=False)
     ram = Column(Integer, nullable=False)
+    datacenter = Column(String, nullable=True)
 
     hdd_count = Column(Integer, nullable=False)
     hdd_size = Column(Float, nullable=False)

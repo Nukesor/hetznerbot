@@ -47,6 +47,7 @@ def update_offers(session, incoming_offers):
     offers = []
 
     for incoming_offer in incoming_offers:
+        print(incoming_offer['datacenter'])
         ids.append(incoming_offer['key'])
         offer = session.query(Offer).get(incoming_offer['key'])
 
@@ -56,6 +57,7 @@ def update_offers(session, incoming_offers):
         offer.cpu = incoming_offer['cpu']
         offer.cpu_rating = incoming_offer['cpu_benchmark']
         offer.ram = incoming_offer['ram']
+        offer.datacenter = incoming_offer['datacenter'][1]
 
         offer.hdd_count = incoming_offer['hdd_count']
         offer.hdd_size = incoming_offer['hdd_size']
@@ -124,6 +126,7 @@ def check_offer_for_subscriber(session, subscriber, offers):
                 or offer.hdd_count < subscriber.hdd_count \
                 or offer.hdd_size < subscriber.hdd_size \
                 or (subscriber.raid is not None and after_raid < subscriber.after_raid) \
+                or (subscriber.datacenter is not None and offer.datacenter != subscriber.datacenter) \
                 or (subscriber.ecc and not offer.ecc)\
                 or (subscriber.inic and not offer.inic)\
                 or (subscriber.hwr and not offer.hwr):
@@ -193,7 +196,8 @@ Ram: {3} GB
 HD: {4} drives with {5} GB Capacity ({6}GB total)
 Extra features: {7}
 Price: {8}
-Next price reduction: {9}""".format(
+Datacenter: {9}
+Next price reduction: {10}""".format(
             i,
             offer.cpu,
             offer.cpu_rating,
@@ -203,6 +207,7 @@ Next price reduction: {9}""".format(
             offer.hdd_size * offer.hdd_count,
             extra_features,
             offer.price,
+            offer.datacenter,
             next_reduction,
         )
         formatted_offers.append(formatted_offer)
