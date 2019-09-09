@@ -19,6 +19,7 @@ Available commands:
         - `after_raid`   int (min size of raid after assembly in GB)
         - `cpu_rating`  int (min cpu rating)
         - `ram`              int (min RAM size in GB)
+        - `datacenter`   enum ('NBG', 'FSN', 'HEL', 'None')
         - `inic [0,1]`  bool (1 if the offer has to have an iNIC)
         - `ecc [0,1]`     bool (1 if the offer has to have ECC RAM)
         - `hwr [0,1]`     bool (1 if the offer has to have a HWR)
