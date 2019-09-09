@@ -47,7 +47,6 @@ def update_offers(session, incoming_offers):
     offers = []
 
     for incoming_offer in incoming_offers:
-        print(incoming_offer['datacenter'])
         ids.append(incoming_offer['key'])
         offer = session.query(Offer).get(incoming_offer['key'])
 
