@@ -5,27 +5,19 @@ import toml
 
 
 default_config = {
-    'telegram': {
-        "api_key": "your_telegram_api_key",
-        "worker_count": 5,
-    },
-    'database': {
-        "sql_uri": 'sqlite:///hetznerbot',
-    },
-    'logging': {
-        "sentry_enabled": False,
-        "sentry_token": "",
-    },
-    'webhook': {
+    "telegram": {"api_key": "your_telegram_api_key", "worker_count": 5,},
+    "database": {"sql_uri": "sqlite:///hetznerbot",},
+    "logging": {"sentry_enabled": False, "sentry_token": "",},
+    "webhook": {
         "enabled": False,
         "domain": "https://localhost",
         "token": "hetznerbot",
-        "cert_path": '/path/to/cert.pem',
+        "cert_path": "/path/to/cert.pem",
         "port": 7000,
     },
 }
 
-config_path = os.path.expanduser('~/.config/hetznerbot.toml')
+config_path = os.path.expanduser("~/.config/hetznerbot.toml")
 
 if not os.path.exists(config_path):
     with open(config_path, "w") as file_descriptor:

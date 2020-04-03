@@ -17,12 +17,14 @@ from hetznerbot.db import base
 class OfferSubscriber(base):
     """The sqlite model for the relationship between offers and subscribers."""
 
-    __tablename__ = 'offer_subscriber'
+    __tablename__ = "offer_subscriber"
 
     id = Column(Integer, primary_key=True)
-    offer_id = Column(Integer, ForeignKey('offer.id', ondelete='cascade'), index=True)
-    subscriber_id = Column(BigInteger, ForeignKey('subscriber.chat_id', ondelete='cascade'), index=True)
-    notified = Column(Boolean, server_default='false', default=False)
+    offer_id = Column(Integer, ForeignKey("offer.id", ondelete="cascade"), index=True)
+    subscriber_id = Column(
+        BigInteger, ForeignKey("subscriber.chat_id", ondelete="cascade"), index=True
+    )
+    notified = Column(Boolean, server_default="false", default=False)
 
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, onupdate=func.now())

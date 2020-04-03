@@ -42,17 +42,17 @@ inic: {6}
 hwr: {7}
 ram: {8} GB
 price: {9} Euro""".format(
-            subscriber.hdd_count,
-            subscriber.hdd_size,
-            subscriber.raid,
-            subscriber.after_raid,
-            subscriber.cpu_rating,
-            subscriber.ecc,
-            subscriber.inic,
-            subscriber.hwr,
-            subscriber.ram,
-            subscriber.price,
-        )
+        subscriber.hdd_count,
+        subscriber.hdd_size,
+        subscriber.raid,
+        subscriber.after_raid,
+        subscriber.cpu_rating,
+        subscriber.ecc,
+        subscriber.inic,
+        subscriber.hwr,
+        subscriber.ram,
+        subscriber.price,
+    )
 
 
 def is_int_or_float(string):
@@ -77,5 +77,5 @@ def int_or_float(string):
         x = int(string)
         return x
     except ValueError:
-        x = float(string.replace(',', '.'))
+        x = float(string.replace(",", "."))
         return x

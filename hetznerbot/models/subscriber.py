@@ -14,14 +14,14 @@ from hetznerbot.db import base
 class Subscriber(base):
     """The sqlite model for a subscriber."""
 
-    __tablename__ = 'subscriber'
+    __tablename__ = "subscriber"
 
     chat_id = Column(BigInteger, primary_key=True)
     active = Column(Boolean, nullable=False, default=True)
 
     hdd_count = Column(Integer, nullable=False, default=3)
     hdd_size = Column(Integer, nullable=False, default=2048)
-    raid = Column(String, default='raid5')
+    raid = Column(String, default="raid5")
     after_raid = Column(Integer, nullable=False, default=4096)
 
     price = Column(Integer, nullable=False, default=40)
@@ -33,7 +33,7 @@ class Subscriber(base):
     inic = Column(Boolean, nullable=False, default=False)
     hwr = Column(Boolean, nullable=False, default=False)
 
-    offer_subscriber = relationship("OfferSubscriber", lazy='joined')
+    offer_subscriber = relationship("OfferSubscriber", lazy="joined")
 
     def __init__(self, chat_id):
         """Create a new subscriber."""

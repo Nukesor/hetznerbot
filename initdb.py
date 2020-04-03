@@ -2,7 +2,7 @@
 """Create new database and schema, if it doesn't exist."""
 from sqlalchemy_utils.functions import database_exists, create_database
 from hetznerbot.db import engine, base
-from hetznerbot.models import * # noqa
+from hetznerbot.models import *  # noqa
 
 
 db_url = engine.url

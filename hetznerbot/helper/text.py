@@ -24,12 +24,12 @@ def split_text(lines, max_chunks=5):
         # We exceed the max chunk size. Start a new chunk
         else:
             char_count = count
-            chunks.append('\n\n'.join(current_chunk))
+            chunks.append("\n\n".join(current_chunk))
             current_chunk = [line]
 
             # We reached the max chunk size. Early return
             if len(chunks) == max_chunks:
                 return chunks
 
-    chunks.append('\n\n'.join(current_chunk))
+    chunks.append("\n\n".join(current_chunk))
     return chunks

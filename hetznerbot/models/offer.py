@@ -16,7 +16,7 @@ from hetznerbot.db import base
 class Offer(base):
     """The sqlite model for an offer."""
 
-    __tablename__ = 'offer'
+    __tablename__ = "offer"
 
     id = Column(Integer, primary_key=True)
     deactivated = Column(Boolean, nullable=False, default=False)
