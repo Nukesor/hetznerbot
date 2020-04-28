@@ -3,6 +3,8 @@ import traceback
 from functools import wraps
 
 from hetznerbot.db import get_session
+from hetznerbot.config import config
+from hetznerbot.models import Subscriber
 from hetznerbot.sentry import sentry
 
 
@@ -38,9 +40,17 @@ def session_wrapper(send_message=True):
 
         @wraps(func)
         def wrapper(update, context):
-            session = get_session()
             try:
-                func(context.bot, update, session)
+                session = get_session()
+                subscriber = Subscriber.get_or_create(session, update.message.chat_id)
+
+                if not subscriber.authorized and update.message.from_user.username.lower() != config['telegram']['admin']:
+                    update.message.chat.send_message(
+                        "Sorry. Hetznerbot is no longer public."
+                    )
+                    return
+
+                func(context.bot, update, session, subscriber)
                 session.commit()
             except:
                 if send_message:

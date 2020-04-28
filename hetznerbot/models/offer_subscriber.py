@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     func,
     Integer,
+    UniqueConstraint,
 )
 
 
@@ -18,11 +19,19 @@ class OfferSubscriber(base):
     """The sqlite model for the relationship between offers and subscribers."""
 
     __tablename__ = "offer_subscriber"
+    __table_args__ = (
+        UniqueConstraint("offer_id", "subscriber_id", name="uniq_offer_subscriber"),
+    )
 
     id = Column(Integer, primary_key=True)
-    offer_id = Column(Integer, ForeignKey("offer.id", ondelete="cascade"), index=True)
+    offer_id = Column(
+        Integer, ForeignKey("offer.id", ondelete="cascade"), index=True, nullable=False
+    )
     subscriber_id = Column(
-        BigInteger, ForeignKey("subscriber.chat_id", ondelete="cascade"), index=True
+        BigInteger,
+        ForeignKey("subscriber.chat_id", ondelete="cascade"),
+        index=True,
+        nullable=False,
     )
     notified = Column(Boolean, server_default="false", default=False)
 

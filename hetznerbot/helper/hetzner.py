@@ -92,60 +92,63 @@ def update_offers(session, incoming_offers):
 
 def check_all_offers_for_subscriber(session, subscriber):
     """Check all offers for a specific subscriber."""
-    offers = session.query(Offer).filter(Offer.deactivated.is_(False)).all()
-
-    check_offer_for_subscriber(session, subscriber, offers)
+    check_offer_for_subscriber(session, subscriber)
 
 
-def check_offers_for_subscribers(session, offers):
+def check_offers_for_subscribers(session):
     """Check for each offer if any subscriber are interested in it."""
     subscribers = session.query(Subscriber).filter(Subscriber.active.is_(True)).all()
 
     for subscriber in subscribers:
-        check_offer_for_subscriber(session, subscriber, offers)
+        check_offer_for_subscriber(session, subscriber)
 
 
-def check_offer_for_subscriber(session, subscriber, offers):
+def check_offer_for_subscriber(session, subscriber):
     """Check the offers for a specific subscriber."""
-    matching_offers = []
-    for offer in offers:
-        # Calculate after_raid
-        if subscriber.raid == "raid5":
-            after_raid = (offer.hdd_count - 1) * offer.hdd_size
-        elif subscriber.raid == "raid6":
-            after_raid = (offer.hdd_count - 2) * offer.hdd_size
+    query = (
+        session.query(Offer)
+        .filter(Offer.deactivated.is_(False))
+        .filter(Offer.price <= subscriber.price)
+        .filter(Offer.cpu_rating >= subscriber.cpu_rating)
+        .filter(Offer.ram >= subscriber.ram)
+        .filter(Offer.hdd_count >= subscriber.hdd_count)
+        .filter(Offer.hdd_size >= subscriber.hdd_size)
+    )
 
-        if (
-            offer.price > subscriber.price
-            or offer.cpu_rating < subscriber.cpu_rating
-            or offer.ram < subscriber.ram
-            or offer.hdd_count < subscriber.hdd_count
-            or offer.hdd_size < subscriber.hdd_size
-            or (subscriber.raid is not None and after_raid < subscriber.after_raid)
-            or (
-                subscriber.datacenter is not None
-                and offer.datacenter != subscriber.datacenter
-            )
-            or (subscriber.ecc and not offer.ecc)
-            or (subscriber.inic and not offer.inic)
-            or (subscriber.hwr and not offer.hwr)
-        ):
-            continue
+    # Calculate after_raid
+    if subscriber.raid == "raid5":
+        after_raid = (Offer.hdd_count - 1) * Offer.hdd_size
+        query = query.filter(subscriber.after_raid <= after_raid)
+    elif subscriber.raid == "raid6":
+        after_raid = (Offer.hdd_count - 2) * Offer.hdd_size
+        query = query.filter(subscriber.after_raid <= after_raid)
 
-        # Function for finding a matching offer_subscriber
-        def find(offer_subscriber):
-            return True if offer_subscriber.offer_id == offer.id else False
+    if subscriber.datacenter is not None:
+        match_offers = query.filter(Offer.datacenter != subscriber.datacenter)
 
+    if subscriber.ecc:
+        match_offers = query.filter(Offer.ecc.is_(True))
+
+    if subscriber.inic:
+        match_offers = query.filter(Offer.inic.is_(True))
+
+    if subscriber.hwr:
+        match_offers = query.filter(Offer.hwr.is_(True))
+
+    matching_offers = query.all()
+
+    for offer in matching_offers:
         # There is no relation yet. Create a new OfferSubscriber entity
-        exists = list(filter(find, subscriber.offer_subscriber))
+        exists = list(
+            filter(lambda o: o.offer_id == offer.id, subscriber.offer_subscriber)
+        )
+
         if len(exists) == 0:
             offer_subscriber = OfferSubscriber(offer.id, subscriber.chat_id)
             subscriber.offer_subscriber.append(offer_subscriber)
             session.add(offer_subscriber)
 
-        matching_offers.append(offer)
-
-    session.commit()
+        session.commit()
 
     # Clean old entries
     for offer_subscriber in subscriber.offer_subscriber:
@@ -158,11 +161,8 @@ def check_offer_for_subscriber(session, subscriber, offers):
 def format_offers(offer_subscriber, get_all=False):
     """Format the found offers."""
     # Filter all offers, which aren't notified yet, if the user doesn't want all offers.
-    def not_notified(offer_subscriber):
-        return not offer_subscriber.notified
-
     if not get_all:
-        offer_subscriber = list(filter(not_notified, offer_subscriber))
+        offer_subscriber = list(filter(lambda o: not o.notified, offer_subscriber))
 
     if len(offer_subscriber) == 0:
         return []

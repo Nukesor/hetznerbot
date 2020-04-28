@@ -33,7 +33,9 @@ class Subscriber(base):
     inic = Column(Boolean, nullable=False, default=False)
     hwr = Column(Boolean, nullable=False, default=False)
 
-    offer_subscriber = relationship("OfferSubscriber", lazy="joined")
+    authorized = Column(Boolean, nullable=False, server_default="FALSE", default=False)
+
+    offer_subscriber = relationship("OfferSubscriber", lazy="joined", cascade="all")
 
     def __init__(self, chat_id):
         """Create a new subscriber."""

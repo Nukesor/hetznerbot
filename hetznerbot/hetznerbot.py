@@ -27,36 +27,31 @@ from hetznerbot.helper.hetzner import (
 
 @run_async
 @session_wrapper()
-def send_help_text(bot, update, session):
+def send_help_text(bot, update, session, subscriber):
     """Send a help text."""
     bot.send_message(chat_id=update.message.chat_id, text=help_text)
 
 
 @run_async
 @session_wrapper()
-def info(bot, update, session):
+def info(bot, update, session, subscriber):
     """Get the newest hetzner offers."""
-    chat_id = update.message.chat_id
-    subscriber = Subscriber.get_or_create(session, chat_id)
-
-    bot.send_message(chat_id=chat_id, text=get_subscriber_info(subscriber))
+    bot.send_message(
+        chat_id=update.message.chat_id, text=get_subscriber_info(subscriber)
+    )
 
 
 @session_wrapper()
-def get_offers(bot, update, session):
+def get_offers(bot, update, session, subscriber):
     """Get the newest hetzner offers."""
-    subscriber = Subscriber.get_or_create(session, update.message.chat_id)
-
     check_all_offers_for_subscriber(session, subscriber)
     send_offers(bot, subscriber, session, get_all=True)
 
 
 @run_async
 @session_wrapper()
-def set_parameter(bot, update, session):
+def set_parameter(bot, update, session, subscriber):
     """Set query attributes."""
-    chat_id = update.message.chat_id
-    subscriber = Subscriber.get_or_create(session, chat_id)
     chat = update.message.chat
 
     text = update.message.text
@@ -150,18 +145,15 @@ def set_parameter(bot, update, session):
 
 @run_async
 @session_wrapper()
-def start(bot, update, session):
+def start(bot, update, session, subscriber):
     """Start the bot."""
-    chat_id = update.message.chat_id
-
-    subscriber = Subscriber.get_or_create(session, chat_id)
     subscriber.active = True
     session.add(subscriber)
     session.commit()
 
     bot.send_message(chat_id=update.message.chat_id, text=help_text)
     text = "You will now receive offers. Type /help for more info."
-    bot.send_message(chat_id=chat_id, text=text)
+    bot.send_message(chat_id=update.message.chat_id, text=text)
 
     check_all_offers_for_subscriber(session, subscriber)
     send_offers(bot, subscriber, session)
@@ -169,17 +161,14 @@ def start(bot, update, session):
 
 @run_async
 @session_wrapper()
-def stop(bot, update, session):
+def stop(bot, update, session, subscriber):
     """Stop the bot."""
-    chat_id = update.message.chat_id
-
-    subscriber = Subscriber.get_or_create(session, chat_id)
     subscriber.active = False
     session.add(subscriber)
     session.commit()
 
     text = "You won't receive any more offers."
-    bot.send_message(chat_id=chat_id, text=text)
+    bot.send_message(chat_id=update.message.chat_id, text=text)
 
 
 @job_session_wrapper()
@@ -190,8 +179,16 @@ def process_all(context, session):
     if incoming_offers is None:
         return
 
+    from datetime import datetime
+
+    start = datetime.now()
+    print(start)
+    print(len(incoming_offers))
+    print(start)
     offers = update_offers(session, incoming_offers)
-    check_offers_for_subscribers(session, offers)
+    print(datetime.now() - start)
+    check_offers_for_subscribers(session)
+    print(datetime.now() - start)
 
     subscribers = session.query(Subscriber).filter(Subscriber.active.is_(True)).all()
     for subscriber in subscribers:
@@ -200,9 +197,11 @@ def process_all(context, session):
         except BadRequest as e:
             if e.message == "Chat not found":
                 session.delete(subscriber)
+                session.commit()
         # Bot was removed from group
         except Unauthorized:
             session.delete(subscriber)
+            session.commit()
 
 
 # Initialize telegram updater and dispatcher
