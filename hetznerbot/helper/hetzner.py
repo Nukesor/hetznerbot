@@ -75,6 +75,7 @@ def update_offers(session, incoming_offers):
         offer.next_reduction = dateparser.parse(
             "in " + incoming_offer["next_reduce_hr"]
         )
+        offer.next_reduction.replace(microsecond=0)
 
         offer.deactivated = False
         session.add(offer)
@@ -190,13 +191,14 @@ def format_offers(offer_subscriber, get_all=False):
         if extra_features == "":
             extra_features = "None"
 
-        formatted_offer = """Offer {0}
-Cpu: {1} with rating {2}
-Ram: {3} GB
-HD: {4} drives with {5} GB Capacity ({6}GB total)
-Extra features: {7}
-Price: {8}
-Datacenter: {9}
+        formatted_offer = """*Offer {0}:*
+
+_Cpu:_ {1} with rating *{2}*
+_Ram:_ {3} GB
+_HD:_ {4} drives with {5} GB Capacity *({6}GB total)*
+_Extra features:_ *{7}*
+_Price:_ {8}€
+_Datacenter:_ {9}
 Next price reduction: {10}""".format(
             i,
             offer.cpu,
