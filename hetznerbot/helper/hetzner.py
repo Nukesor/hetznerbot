@@ -193,12 +193,12 @@ def format_offers(offer_subscriber, get_all=False):
 
         formatted_offer = """*Offer {0}:*
 
-_Cpu:_ {1} with rating *{2}*
-_Ram:_ {3} GB
-_HD:_ {4} drives with {5} GB Capacity *({6}GB total)*
-_Extra features:_ *{7}*
-_Price:_ {8}€
-_Datacenter:_ {9}
+__Cpu:__ {1} with rating *{2}*
+__Ram:__ {3} GB
+__HD:__ {4} drives with {5} GB Capacity *({6}GB total)*
+__Extra features:__ *{7}*
+__Price:__ {8}€
+__Datacenter:__ {9}
 Next price reduction: {10}""".format(
             i,
             offer.cpu,
@@ -231,7 +231,7 @@ def send_offers(bot, subscriber, session, get_all=False):
         for chunk in formatted_offers:
             try:
                 bot.sendMessage(
-                    chat_id=subscriber.chat_id, text=chunk,
+                    chat_id=subscriber.chat_id, text=chunk, parse_mode="Markdown",
                 )
             except telegram.error.Unauthorized:
                 session.delete(subscriber)
@@ -242,9 +242,11 @@ def send_offers(bot, subscriber, session, get_all=False):
                 chat_id=subscriber.chat_id,
                 text="Too many results, please narrow down your search a little.",
             )
+            return
     else:
         if get_all:
             bot.sendMessage(
                 chat_id=subscriber.chat_id,
+                parse_mode="Markdown",
                 text="There are currently no offers for your criteria.",
             )
