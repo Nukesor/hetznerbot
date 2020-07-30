@@ -199,7 +199,7 @@ _Extra features:_ *{7}*
 _Price:_ {8}€
 _Datacenter:_ {9}
 Next price reduction: {10}""".format(
-            i,
+            offer.id,
             offer.cpu,
             offer.cpu_rating,
             offer.ram,
