@@ -168,7 +168,7 @@ def format_offers(offer_subscriber, get_all=False):
     if len(offer_subscriber) == 0:
         return []
 
-    formatted_offers = ["All offers:" if get_all else "New offers:"]
+    formatted_offers = []
     for i, offer_subscriber in enumerate(offer_subscriber):
         # The subscriber should only receive new offers
         offer_subscriber.notified = True
@@ -192,7 +192,6 @@ def format_offers(offer_subscriber, get_all=False):
             extra_features = "None"
 
         formatted_offer = """*Offer {0}:*
-
 _Cpu:_ {1} with rating *{2}*
 _Ram:_ *{3} GB*
 _HD:_ {4} drives with *{5} GB* Capacity *({6}GB total)*
