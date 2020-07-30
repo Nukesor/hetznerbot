@@ -193,12 +193,12 @@ def format_offers(offer_subscriber, get_all=False):
 
         formatted_offer = """*Offer {0}:*
 
-__Cpu:__ {1} with rating *{2}*
-__Ram:__ {3} GB
-__HD:__ {4} drives with {5} GB Capacity *({6}GB total)*
-__Extra features:__ *{7}*
-__Price:__ {8}€
-__Datacenter:__ {9}
+_Cpu:_ {1} with rating *{2}*
+_Ram:_ {3} GB
+_HD:_ {4} drives with {5} GB Capacity *({6}GB total)*
+_Extra features:_ *{7}*
+_Price:_ {8}€
+_Datacenter:_ {9}
 Next price reduction: {10}""".format(
             i,
             offer.cpu,
