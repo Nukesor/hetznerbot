@@ -5,7 +5,11 @@ import toml
 
 
 default_config = {
-    "telegram": {"api_key": "your_telegram_api_key", "worker_count": 5, 'admin': 'nukesor'},
+    "telegram": {
+        "api_key": "your_telegram_api_key",
+        "worker_count": 5,
+        "admin": "nukesor",
+    },
     "database": {"sql_uri": "sqlite:///hetznerbot",},
     "logging": {"sentry_enabled": False, "sentry_token": "",},
     "webhook": {

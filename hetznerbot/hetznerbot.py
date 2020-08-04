@@ -182,13 +182,8 @@ def process_all(context, session):
     from datetime import datetime
 
     start = datetime.now()
-    print(start)
-    print(len(incoming_offers))
-    print(start)
     offers = update_offers(session, incoming_offers)
-    print(datetime.now() - start)
     check_offers_for_subscribers(session)
-    print(datetime.now() - start)
 
     subscribers = session.query(Subscriber).filter(Subscriber.active.is_(True)).all()
     for subscriber in subscribers:

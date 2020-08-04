@@ -22,8 +22,8 @@ def upgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
 
-    session.execute('DELETE FROM offer_subscriber where subscriber_id is NULL')
-    session.execute('UPDATE subscriber SET active = False')
+    session.execute("DELETE FROM offer_subscriber where subscriber_id is NULL")
+    session.execute("UPDATE subscriber SET active = False")
 
     op.alter_column(
         "offer_subscriber", "offer_id", existing_type=sa.INTEGER(), nullable=False

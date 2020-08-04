@@ -1,5 +1,6 @@
 """Hetzner helper functions."""
 import json
+from json import JSONDecodeError
 import telegram
 import dateparser
 from requests import request
@@ -30,6 +31,8 @@ def get_hetzner_offers():
     except ConnectionError:
         print("Connection error while retrieving data.")
         return None
+    except JSONDecodeError:
+        sentry.capture_exception(extra={"data": data})
 
     return data["server"]
 
@@ -37,7 +40,7 @@ def get_hetzner_offers():
 def calculate_price(price):
     """Get the brutto price."""
     price = float(price)
-    price = price * 1.19
+    price = price * 1.16
     return int(round(price, 0))
 
 
