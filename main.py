@@ -5,6 +5,7 @@ from hetznerbot.config import config
 from hetznerbot.hetznerbot import updater
 
 if config["webhook"]["enabled"]:
+    print("Starting up")
     updater.start_webhook(
         listen="127.0.0.1",
         port=config["webhook"]["port"],
@@ -16,5 +17,6 @@ if config["webhook"]["enabled"]:
         url=f"{domain}{token}", certificate=open(config["webhook"]["cert_path"], "rb")
     )
 else:
+    print("Starting up")
     updater.start_polling()
     updater.idle()
