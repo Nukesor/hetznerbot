@@ -137,7 +137,7 @@ def set_parameter(bot, update, session, subscriber):
     session.add(subscriber)
     session.commit()
 
-    chat.send_message(f'"{name}" changed to {value}')
+    chat.send_message(f"*{name}* changed to {value}", parse_mode="Markdown")
 
     check_all_offers_for_subscriber(session, subscriber)
     send_offers(bot, subscriber, session)
