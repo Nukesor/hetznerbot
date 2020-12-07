@@ -203,7 +203,7 @@ dispatcher = updater.dispatcher
 
 # Set the log level for apscheduler to WARNING
 # There's a lot of log output spam otherwise
-# logging.getLogger("apscheduler").setLevel(logging.INFO)
+logging.getLogger("apscheduler").setLevel(logging.INFO)
 
 # Register all jobs
 

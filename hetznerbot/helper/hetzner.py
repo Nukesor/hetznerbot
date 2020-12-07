@@ -1,4 +1,5 @@
 """Hetzner helper functions."""
+import time
 import json
 from json import JSONDecodeError
 import telegram
@@ -24,7 +25,9 @@ def get_hetzner_offers():
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36",
     }
 
-    url = "https://www.hetzner.de/a_hz_serverboerse/live_data.json"
+    # Hetzner expects a millisecond unix timestamp at the end
+    unix_timestamp = int(time.time() * 1000)
+    url = f"https://www.hetzner.com/a_hz_serverboerse/live_data.json?m={unix_timestamp}"
     try:
         response = request("GET", url, headers=headers)
         data = json.loads(response.content)
@@ -233,7 +236,9 @@ def send_offers(bot, subscriber, session, get_all=False):
         for chunk in formatted_offers:
             try:
                 bot.sendMessage(
-                    chat_id=subscriber.chat_id, text=chunk, parse_mode="Markdown",
+                    chat_id=subscriber.chat_id,
+                    text=chunk,
+                    parse_mode="Markdown",
                 )
             except telegram.error.Unauthorized:
                 session.delete(subscriber)
