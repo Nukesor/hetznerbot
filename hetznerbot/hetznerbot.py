@@ -1,7 +1,7 @@
 """A bot which checks if there is a new record in the server section of hetzner."""
-import logging
 from datetime import datetime
 from telegram.ext import (
+    run_async,
     CommandHandler,
     Updater,
 )
@@ -26,12 +26,14 @@ from hetznerbot.helper.hetzner import (
 )
 
 
+@run_async
 @session_wrapper()
 def send_help_text(bot, update, session, subscriber):
     """Send a help text."""
     bot.send_message(chat_id=update.message.chat_id, text=help_text)
 
 
+@run_async
 @session_wrapper()
 def info(bot, update, session, subscriber):
     """Get the newest hetzner offers."""
@@ -47,6 +49,7 @@ def get_offers(bot, update, session, subscriber):
     send_offers(bot, subscriber, session, get_all=True)
 
 
+@run_async
 @session_wrapper()
 def set_parameter(bot, update, session, subscriber):
     """Set query attributes."""
@@ -141,6 +144,7 @@ def set_parameter(bot, update, session, subscriber):
     send_offers(bot, subscriber, session)
 
 
+@run_async
 @session_wrapper()
 def start(bot, update, session, subscriber):
     """Start the bot."""
@@ -156,6 +160,7 @@ def start(bot, update, session, subscriber):
     send_offers(bot, subscriber, session)
 
 
+@run_async
 @session_wrapper()
 def stop(bot, update, session, subscriber):
     """Stop the bot."""
@@ -201,23 +206,18 @@ updater = Updater(
 )
 dispatcher = updater.dispatcher
 
-# Set the log level for apscheduler to WARNING
-# There's a lot of log output spam otherwise
-logging.getLogger("apscheduler").setLevel(logging.INFO)
-
-# Register all jobs
 
 # Create jobs
 job_queue = updater.job_queue
 job_queue.run_repeating(process_all, interval=120, first=0, name="Process all")
 
 # Create handler
-help_handler = CommandHandler("help", send_help_text, run_async=True)
-get_handler = CommandHandler("get", get_offers, run_async=True)
-set_handler = CommandHandler("set", set_parameter, run_async=True)
-info_handler = CommandHandler("info", info, run_async=True)
-stop_handler = CommandHandler("stop", stop, run_async=True)
-start_handler = CommandHandler("start", start, run_async=True)
+help_handler = CommandHandler("help", send_help_text)
+get_handler = CommandHandler("get", get_offers)
+set_handler = CommandHandler("set", set_parameter)
+info_handler = CommandHandler("info", info)
+stop_handler = CommandHandler("stop", stop)
+start_handler = CommandHandler("start", start)
 
 # Add handler
 dispatcher.add_handler(help_handler)
