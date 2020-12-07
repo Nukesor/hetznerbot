@@ -8,18 +8,18 @@ repository = "https://github.com/nukesor/hetznerbot"
 
 [tool.poetry.dependencies]
 python = ">=3.6"
-python-telegram-bot = "^12"
-sentry-sdk = "&0.16"
+python-telegram-bot = "^13"
+sentry-sdk = "^0.19"
 alembic = "^1"
 SQLAlchemy = "^1"
 sqlalchemy-utils = "^0.36"
 psycopg2-binary = "^2"
 toml = "^0.10"
 requests = "^2"
-dateparser = "^0.7"
+dateparser = "^1"
 
 [tool.poetry.dev-dependencies]
-pytest-mock = "^1"
+pytest-mock = "^3"
 pytest = "^6"
 
 [build-system]

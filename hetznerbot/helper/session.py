@@ -8,28 +8,22 @@ from hetznerbot.models import Subscriber
 from hetznerbot.sentry import sentry
 
 
-def job_session_wrapper():
+def job_session_wrapper(func):
     """Create a session and handle exceptions for jobs."""
 
-    def real_decorator(func):
-        """Parametrized decorator closure."""
+    def wrapper(context):
+        session = get_session()
+        try:
+            func(context, session)
 
-        @wraps(func)
-        def wrapper(context):
-            session = get_session()
-            try:
-                func(context, session)
+            session.commit()
+        except:  # noqa
+            traceback.print_exc()
+            sentry.capture_exception(tags={"handler": "job"})
+        finally:
+            session.close()
 
-                session.commit()
-            except:  # noqa
-                traceback.print_exc()
-                sentry.capture_exception(tags={"handler": "job"})
-            finally:
-                session.close()
-
-        return wrapper
-
-    return real_decorator
+    return wrapper
 
 
 def session_wrapper(send_message=True):
