@@ -31,13 +31,13 @@ def get_hetzner_offers():
     try:
         response = request("GET", url, headers=headers)
         data = json.loads(response.content)
+        return data["server"]
     except ConnectionError:
         print("Connection error while retrieving data.")
         return None
     except JSONDecodeError:
-        sentry.capture_exception(extra={"data": data})
-
-    return data["server"]
+        sentry.capture_exception()
+        return None
 
 
 def calculate_price(price):
