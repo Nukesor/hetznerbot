@@ -37,7 +37,7 @@ class Offer(base):
     next_reduction = Column(DateTime)
     last_update = Column(DateTime, server_default=func.now(), nullable=False)
 
-    offer_subscriber = relationship("OfferSubscriber")
+    offer_subscriber = relationship("OfferSubscriber", back_populates="offer")
 
     def __init__(self, offer_id):
         """Create a new subscriber."""

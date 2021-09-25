@@ -34,8 +34,8 @@ def session_wrapper(send_message=True):
 
         @wraps(func)
         def wrapper(update, context):
+            session = get_session()
             try:
-                session = get_session()
                 subscriber = Subscriber.get_or_create(session, update.message.chat_id)
 
                 username = update.message.from_user.username

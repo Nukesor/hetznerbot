@@ -11,7 +11,6 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 
-
 from hetznerbot.db import base
 
 
