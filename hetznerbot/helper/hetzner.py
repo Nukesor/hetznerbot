@@ -43,7 +43,7 @@ def get_hetzner_offers():
 def calculate_price(price):
     """Get the brutto price."""
     price = float(price)
-    price = price * 1.16
+    price = price * 1.19
     return int(round(price, 0))
 
 
