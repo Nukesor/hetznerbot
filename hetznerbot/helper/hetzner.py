@@ -40,13 +40,6 @@ def get_hetzner_offers():
         return None
 
 
-def calculate_price(price):
-    """Get the brutto price."""
-    price = float(price)
-    price = price * 1.19
-    return int(round(price, 0))
-
-
 def update_offers(session, incoming_offers):
     """Update all offers and check for updates."""
     ids = []
@@ -72,7 +65,7 @@ def update_offers(session, incoming_offers):
         offer.hwr = "HWR" in incoming_offer["specials"]
 
         # Notify all subscribers about the price change
-        price = int(incoming_offer["price"])
+        price = int(float(incoming_offer["price"]))
         if offer.price is not None and offer.price != price:
             for offer_subscriber in offer.offer_subscriber:
                 offer_subscriber.notified = False
