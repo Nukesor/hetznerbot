@@ -53,29 +53,3 @@ price: {9} Euro""".format(
         subscriber.ram,
         subscriber.price,
     )
-
-
-def is_int_or_float(string):
-    """Check if the string is an int or float."""
-    try:
-        int(string)
-        return True
-    except ValueError:
-        try:
-            float(string)
-            return True
-        except ValueError:
-            pass
-        pass
-
-    return False
-
-
-def int_or_float(string):
-    """Return int or float."""
-    try:
-        x = int(string)
-        return x
-    except ValueError:
-        x = float(string.replace(",", "."))
-        return x
