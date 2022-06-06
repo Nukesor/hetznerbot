@@ -17,6 +17,7 @@ psycopg2-binary = "^2"
 toml = "^0.10"
 requests = "^2"
 dateparser = "^1"
+prettytable = "^3.3.0"
 
 [tool.poetry.dev-dependencies]
 pytest-mock = "^3"
