@@ -49,4 +49,4 @@ def get_subscriber_info(subscriber):
     table = table.get_string()
 
     # Return the info in a pretty monospace markdown table.
-    return "```\n{table}\n```"
+    return f"```\n{table}\n```"

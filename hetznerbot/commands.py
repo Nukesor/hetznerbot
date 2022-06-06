@@ -9,6 +9,7 @@ from hetznerbot.helper.hetzner import (
     send_offers,
     check_all_offers_for_subscriber,
 )
+from telegram import ParseMode
 
 
 @session_wrapper()
@@ -21,7 +22,9 @@ def send_help_text(bot, update, session, subscriber):
 def info(bot, update, session, subscriber):
     """Get the newest hetzner offers."""
     bot.send_message(
-        chat_id=update.message.chat_id, text=get_subscriber_info(subscriber)
+        chat_id=update.message.chat_id,
+        text=get_subscriber_info(subscriber),
+        parse_mode=ParseMode.MARKDOWN,
     )
 
 
