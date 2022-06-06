@@ -207,7 +207,7 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
             size = offer.hdd_size * offer.hdd_count
             final_size = f"{size}GB total"
 
-        vat_incl_price = offer.price()
+        vat_incl_price = float(offer.price) * 1.19
         formatted_offer = f"""*Offer {offer.id}:*
 _Cpu:_ {offer.cpu} with rating *{offer.cpu_rating}*
 _Ram:_ *{offer.ram} GB*
