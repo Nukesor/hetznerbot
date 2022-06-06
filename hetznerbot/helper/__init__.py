@@ -32,24 +32,15 @@ Available commands:
 
 def get_subscriber_info(subscriber):
     """Return the formatted information about the current subscriber."""
-    return """hdd_count: {0}
-hdd_size: {1} GB
-raid: {2}
-after_raid: {3} GB
-cpu_rating: {4}
-ecc: {5}
-inic: {6}
-hwr: {7}
-ram: {8} GB
+    return f"""hdd_count: {subscriber.hdd_count}
+hdd_size: {subscriber.hdd_size} GB
+raid: {subscriber.raid}
+after_raid: {subscriber.after_raid} GB
+cpu_rating: {subscriber.cpu_rating}
+ecc: {subscriber.ecc}
+inic: {subscriber.inic}
+hwr: {subscriber.hwr}
+ram: {subscriber.ram} GB
 price: {9} Euro""".format(
-        subscriber.hdd_count,
-        subscriber.hdd_size,
-        subscriber.raid,
-        subscriber.after_raid,
-        subscriber.cpu_rating,
-        subscriber.ecc,
-        subscriber.inic,
-        subscriber.hwr,
-        subscriber.ram,
         subscriber.price,
     )
