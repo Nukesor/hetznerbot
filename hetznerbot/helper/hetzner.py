@@ -72,7 +72,7 @@ def update_offers(session, incoming_offers):
         offer.hwr = "HWR" in incoming_offer["specials"]
 
         # Notify all subscribers about the price change
-        price = calculate_price(incoming_offer["price"])
+        price = int(incoming_offer["price"])
         if offer.price is not None and offer.price != price:
             for offer_subscriber in offer.offer_subscriber:
                 offer_subscriber.notified = False
@@ -165,7 +165,7 @@ def check_offer_for_subscriber(session, subscriber):
     session.commit()
 
 
-def format_offers(offer_subscriber, get_all=False):
+def format_offers(subscriber, offer_subscriber, get_all=False):
     """Format the found offers."""
     # Filter all offers, which aren't notified yet, if the user doesn't want all offers.
     if not get_all:
@@ -175,7 +175,7 @@ def format_offers(offer_subscriber, get_all=False):
         return []
 
     formatted_offers = []
-    for i, offer_subscriber in enumerate(offer_subscriber):
+    for _, offer_subscriber in enumerate(offer_subscriber):
         # The subscriber should only receive new offers
         offer_subscriber.notified = True
         offer = offer_subscriber.offer
@@ -197,26 +197,26 @@ def format_offers(offer_subscriber, get_all=False):
         if extra_features == "":
             extra_features = "None"
 
-        formatted_offer = """*Offer {0}:*
-_Cpu:_ {1} with rating *{2}*
-_Ram:_ *{3} GB*
-_HD:_ {4} drives with *{5} GB* Capacity *({6}GB total)*
-_Extra features:_ *{7}*
-_Price:_ {8}€
-_Datacenter:_ {9}
-Next price reduction: {10}""".format(
-            offer.id,
-            offer.cpu,
-            offer.cpu_rating,
-            offer.ram,
-            offer.hdd_count,
-            offer.hdd_size,
-            offer.hdd_size * offer.hdd_count,
-            extra_features,
-            offer.price,
-            offer.datacenter,
-            next_reduction,
-        )
+        if subscriber.raid == "raid5":
+            size = offer.hdd_size * (offer.hdd_count - 1)
+            final_size = f"{size}GB post-raid5"
+        elif subscriber.raid == "raid6":
+            size = offer.hdd_size * (offer.hdd_count - 2)
+            final_size = f"{size}GB post-raid6"
+        else:
+            size = offer.hdd_size * offer.hdd_count
+            final_size = f"{size}GB total"
+
+        vat_incl_price = offer.price()
+        formatted_offer = f"""*Offer {offer.id}:*
+_Cpu:_ {offer.cpu} with rating *{offer.cpu_rating}*
+_Ram:_ *{offer.ram} GB*
+_HD:_ {offer.hdd_count} drives with *{offer.hdd_size} GB* Capacity *({final_size})*
+_Extra features:_ *{extra_features}*
+_Price:_ {offer.price}€ (VAT incl.: {vat_incl_price:.2f})
+_Datacenter:_ {offer.datacenter}
+Next price reduction: {next_reduction}"""
+
         formatted_offers.append(formatted_offer)
 
     formatted_offers = split_text(formatted_offers, max_chunks=5)
@@ -228,9 +228,11 @@ def send_offers(bot, subscriber, session, get_all=False):
     """Send the newest update to all subscribers."""
     # Extract message meta data
     if get_all:
-        formatted_offers = format_offers(subscriber.offer_subscriber, get_all=True)
+        formatted_offers = format_offers(
+            subscriber, subscriber.offer_subscriber, get_all=True
+        )
     else:
-        formatted_offers = format_offers(subscriber.offer_subscriber)
+        formatted_offers = format_offers(subscriber, subscriber.offer_subscriber)
 
     if len(formatted_offers) > 0:
         for chunk in formatted_offers:
