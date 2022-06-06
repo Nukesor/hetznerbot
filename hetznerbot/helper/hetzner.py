@@ -131,16 +131,16 @@ def check_offer_for_subscriber(session, subscriber):
         query = query.filter(subscriber.after_raid <= after_raid)
 
     if subscriber.datacenter is not None:
-        match_offers = query.filter(Offer.datacenter != subscriber.datacenter)
+        query = query.filter(Offer.datacenter != subscriber.datacenter)
 
     if subscriber.ecc:
-        match_offers = query.filter(Offer.ecc.is_(True))
+        query = query.filter(Offer.ecc.is_(True))
 
     if subscriber.inic:
-        match_offers = query.filter(Offer.inic.is_(True))
+        query = query.filter(Offer.inic.is_(True))
 
     if subscriber.hwr:
-        match_offers = query.filter(Offer.hwr.is_(True))
+        query = query.filter(Offer.hwr.is_(True))
 
     matching_offers = query.all()
 
