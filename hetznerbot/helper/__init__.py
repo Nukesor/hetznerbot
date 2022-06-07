@@ -35,16 +35,16 @@ def get_subscriber_info(subscriber):
     """Return the formatted information about the current subscriber."""
     table = PrettyTable()
     table.field_names = ["Name", "Value"]
+    table.add_row(["price", f"{subscriber.price} Euro"])
+    table.add_row(["cpu_rating", f"{subscriber.cpu_rating}"])
+    table.add_row(["ram", f"{subscriber.ram} GB"])
     table.add_row(["hdd_count", f"{subscriber.hdd_count}"])
     table.add_row(["hdd_size", f"{subscriber.hdd_size} GB"])
     table.add_row(["raid", f"{subscriber.raid}"])
     table.add_row(["after_raid", f"{subscriber.after_raid} GB"])
-    table.add_row(["cpu_rating", f"{subscriber.cpu_rating}"])
     table.add_row(["ecc", f"{subscriber.ecc}"])
     table.add_row(["inic", f"{subscriber.inic}"])
     table.add_row(["hwr", f"{subscriber.hwr}"])
-    table.add_row(["ram", f"{subscriber.ram} GB"])
-    table.add_row(["price", f"{subscriber.price} Euro"])
 
     table = table.get_string()
 
