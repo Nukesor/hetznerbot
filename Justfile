@@ -3,13 +3,12 @@ default: run
 run:
     poetry run python main.py run
 
-initdb:
-    poetry run python main.py initdb
+initdb *args:
+    poetry run python main.py initdb {{ args }}
     poetry run alembic --config migrations/alembic.ini stamp head
 
 migrate:
     poetry run alembic --config migrations/alembic.ini upgrade head
-
 
 setup:
     poetry install
