@@ -2,8 +2,8 @@
 import traceback
 from functools import wraps
 
-from hetznerbot.db import get_session
 from hetznerbot.config import config
+from hetznerbot.db import get_session
 from hetznerbot.models import Subscriber
 from hetznerbot.sentry import sentry
 

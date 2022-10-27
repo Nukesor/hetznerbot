@@ -1,7 +1,6 @@
 """Some static stuff or helper functions for hetzner bot."""
 from prettytable import PrettyTable
 
-
 help_text = """A handy telegram bot which texts you as soon as there is a viable offer available on the hetzner server market.
 
 It is possible to set several search parameter which need to be satisfied for an offer being sent to you.

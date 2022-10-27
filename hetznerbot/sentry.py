@@ -3,7 +3,6 @@ import sentry_sdk
 from sentry_sdk import configure_scope
 
 from hetznerbot.config import config
-from telegram.error import TimedOut
 
 
 class Sentry(object):

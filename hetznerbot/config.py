@@ -1,8 +1,8 @@
 """Config for hetznerbot."""
 import os
 import sys
-import toml
 
+import toml
 
 default_config = {
     "telegram": {
