@@ -1,9 +1,16 @@
 """A bot which checks if there is a new record in the server section of hetzner."""
 from telegram.ext import CommandHandler, Updater
 
-from hetznerbot.commands import *
+from hetznerbot.commands import (
+    get_offers,
+    info,
+    send_help_text,
+    set_parameter,
+    start,
+    stop,
+)
 from hetznerbot.config import config
-from hetznerbot.jobs import *
+from hetznerbot.jobs import process_all
 
 
 def init_app():
