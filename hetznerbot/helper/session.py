@@ -2,8 +2,8 @@
 import traceback
 from functools import wraps
 
-from hetznerbot.db import get_session
 from hetznerbot.config import config
+from hetznerbot.db import get_session
 from hetznerbot.models import Subscriber
 from hetznerbot.sentry import sentry
 
@@ -51,7 +51,7 @@ def session_wrapper(send_message=True):
 
                 func(context.bot, update, session, subscriber)
                 session.commit()
-            except:
+            except:  # noqa E722
                 if send_message:
                     context.bot.sendMessage(
                         chat_id=update.message.chat_id,

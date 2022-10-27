@@ -1,14 +1,6 @@
 """The sqlite model for a subscriber."""
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, func
 from sqlalchemy.orm import relationship
-from sqlalchemy import (
-    Boolean,
-    Column,
-    DateTime,
-    Float,
-    func,
-    Integer,
-    String,
-)
 
 from hetznerbot.db import base
 

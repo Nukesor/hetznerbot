@@ -1,15 +1,15 @@
 """The sqlite model for a subscriber."""
-from sqlalchemy.orm import relationship
 from sqlalchemy import (
     BigInteger,
     Boolean,
     Column,
     DateTime,
     ForeignKey,
-    func,
     Integer,
     UniqueConstraint,
+    func,
 )
+from sqlalchemy.orm import relationship
 
 from hetznerbot.db import base
 

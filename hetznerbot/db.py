@@ -1,9 +1,10 @@
 """Helper class to get a database engine and to get a session."""
-from hetznerbot.config import config
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+
+from hetznerbot.config import config
 
 engine = create_engine(config["database"]["sql_uri"])
 base = declarative_base(bind=engine)

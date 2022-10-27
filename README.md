@@ -2,7 +2,6 @@
 
 [![MIT Licence](https://img.shields.io/badge/license-MIT-success.svg)](https://github.com/Nukesor/pollbot/blob/master/LICENSE.md)
 
-
 A handy telegram bot which texts you as soon as there is a viable offer available on the hetzner server market.
 It is possible to set several search parameter which need to be satisfied for an offer to be sent to you.
 
@@ -14,7 +13,7 @@ If the price of an offer is reduced you will get a new notification with the upd
 
 Available commands:
 
-```
+```txt
 /start Start the bot
 /stop Stop the bot
 /set Set search attributes with this syntax: "\set hdd_count 3"
@@ -36,32 +35,32 @@ Available commands:
 
 Feel free to host your own or to use mine: @hetzner_offer_bot
 
+## Installation and run
 
-## Installation and starting:
 **This bot is developed for Linux.**
 
 Windows isn't tested, but it shouldn't be too hard to make it compatible. Feel free to create a PR.
 
-Dependencies: 
-- `poetry` to manage and install dependencies.
-- Hetznerbot uses sqlite by default
+Dependencies:
 
-1. Clone the repository: 
+- `poetry` to manage and install dependencies.
+- [Just](https://github.com/casey/just) for convience.
+- Hetznerbot uses postgres by default
+
+1. Clone the repository:
+
     ```sh
     git clone git@github.com:nukesor/hetznerbot && cd hetznerbot
     ```
-2. Execute following commands to install all dependencies and to initialize the database:
-    ```sh
-    poetry install
-    poetry run initdb.py
-    ```
-3. Either start hetznerbot once or copy the `hetznerbot.toml` manually to `~/.config/hetznerbot.toml` and adjust all necessary values.
-4. Start the bot: `poetry run main.py`
+1. Run `just setup` to install dependencies
+1. Run `just initdb` to initialize the database
+1. Start the bot once with `just run` to create the default config at `~/.config/hetznerbot.toml`
+1. Adjust the config file
+1. Start the bot with `just run`
 
+## Bot Commands
 
-# Bot commands
-
-```
+```txt
 start - Start the bot
 stop - Stop the bot
 get - Get the newest Offers

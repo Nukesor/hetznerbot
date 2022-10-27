@@ -1,12 +1,6 @@
 """The sqlite model for a subscriber."""
+from sqlalchemy import BigInteger, Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
-from sqlalchemy import (
-    BigInteger,
-    Boolean,
-    Column,
-    String,
-    Integer,
-)
 
 from hetznerbot.db import base
 
