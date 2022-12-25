@@ -24,7 +24,7 @@ def get_hetzner_offers():
 
     # Hetzner expects a millisecond unix timestamp at the end
     unix_timestamp = int(time.time() * 1000)
-    url = f"https://www.hetzner.com/a_hz_serverboerse/live_data.json?m={unix_timestamp}"
+    url = f"https://www.hetzner.com/a_hz_serverboerse/live_data_de.json?m={unix_timestamp}"
     try:
         response = request("GET", url, headers=headers)
         data = json.loads(response.content)
