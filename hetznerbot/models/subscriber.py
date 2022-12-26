@@ -19,7 +19,6 @@ class Subscriber(base):
     after_raid = Column(Integer, nullable=False, default=4096)
 
     price = Column(Integer, nullable=False, default=40)
-    cpu_rating = Column(Integer, nullable=False, default=8500)
     ram = Column(Integer, nullable=False, default=16)
     datacenter = Column(String, nullable=True)
 

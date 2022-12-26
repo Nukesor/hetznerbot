@@ -42,7 +42,6 @@ def set_parameter(bot, update, session, subscriber):
         "raid",
         "after_raid",
         "datacenter",
-        "cpu_rating",
         "ram",
         "price",
         "ecc",

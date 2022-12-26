@@ -50,8 +50,7 @@ def update_offers(session, incoming_offers):
             offer = Offer(incoming_offer["key"])
 
         offer.cpu = incoming_offer["cpu"]
-        offer.cpu_rating = incoming_offer["cpu_benchmark"]
-        offer.ram = incoming_offer["ram"]
+        offer.ram = incoming_offer["ram_size"]
         offer.datacenter = incoming_offer["datacenter"][1]
 
         offer.hdd_count = incoming_offer["hdd_count"]
@@ -68,10 +67,6 @@ def update_offers(session, incoming_offers):
                 offer_subscriber.notified = False
 
         offer.price = price
-        offer.next_reduction = dateparser.parse(
-            "in " + incoming_offer["next_reduce_hr"]
-        )
-        offer.next_reduction.replace(microsecond=0)
 
         offer.deactivated = False
         session.add(offer)
@@ -106,7 +101,6 @@ def check_offer_for_subscriber(session, subscriber):
         session.query(Offer)
         .filter(Offer.deactivated.is_(False))
         .filter(Offer.price <= subscriber.price)
-        .filter(Offer.cpu_rating >= subscriber.cpu_rating)
         .filter(Offer.ram >= subscriber.ram)
         .filter(Offer.hdd_count >= subscriber.hdd_count)
         .filter(Offer.hdd_size >= subscriber.hdd_size)
@@ -170,12 +164,6 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
         offer_subscriber.notified = True
         offer = offer_subscriber.offer
 
-        # Format next reduction
-        if offer.next_reduction is not None:
-            next_reduction = offer.next_reduction
-        else:
-            next_reduction = "Fixed Price"
-
         # Format extra features
         extra_features = ""
         if offer.ecc:
@@ -199,13 +187,12 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
 
         vat_incl_price = float(offer.price) * 1.19
         formatted_offer = f"""*Offer {offer.id}:*
-_Cpu:_ {offer.cpu} with rating *{offer.cpu_rating}*
+_Cpu:_ {offer.cpu}
 _Ram:_ *{offer.ram} GB*
 _HD:_ {offer.hdd_count} drives with *{offer.hdd_size} GB* Capacity *({final_size})*
 _Extra features:_ *{extra_features}*
 _Price:_ {offer.price}€ (VAT incl.: {vat_incl_price:.2f})
-_Datacenter:_ {offer.datacenter}
-Next price reduction: {next_reduction}"""
+_Datacenter:_ {offer.datacenter}"""
 
         formatted_offers.append(formatted_offer)
 

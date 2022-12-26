@@ -14,7 +14,6 @@ class Offer(base):
     deactivated = Column(Boolean, nullable=False, default=False)
 
     cpu = Column(String, nullable=False)
-    cpu_rating = Column(Integer, nullable=False)
     ram = Column(Integer, nullable=False)
     datacenter = Column(String, nullable=True)
 
@@ -26,7 +25,6 @@ class Offer(base):
     hwr = Column(Boolean, nullable=False, default=False)
 
     price = Column(Integer, nullable=False)
-    next_reduction = Column(DateTime)
     last_update = Column(DateTime, server_default=func.now(), nullable=False)
 
     offer_subscriber = relationship("OfferSubscriber", back_populates="offer")

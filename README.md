@@ -22,7 +22,6 @@ Available commands:
         - `hdd_size`     int (min amount of GB for each disk)
         - `raid`        enum ('raid5', 'raid6', 'None')
         - `after_raid`  int (min size of raid after assembly in TB)
-        - `cpu_rating`  int (min cpu rating)
         - `ram`         int (min RAM size in GB)
         - `price`       int (max Price in Euro)
         - `ecc`         bool (0 or 1)

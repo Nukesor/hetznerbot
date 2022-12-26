@@ -17,7 +17,6 @@ Available commands:
         - `hdd_size`       int (min amount of GB for each disk)
         - `raid`             enum ('raid5', 'raid6', 'None')
         - `after_raid`   int (min size of raid after assembly in GB)
-        - `cpu_rating`  int (min cpu rating)
         - `ram`              int (min RAM size in GB)
         - `datacenter`   enum ('NBG', 'FSN', 'HEL', 'None')
         - `inic [0,1]`  bool (1 if the offer has to have an iNIC)
@@ -35,7 +34,6 @@ def get_subscriber_info(subscriber):
     table = PrettyTable()
     table.field_names = ["Name", "Value"]
     table.add_row(["price", f"{subscriber.price} Euro"])
-    table.add_row(["cpu_rating", f"{subscriber.cpu_rating}"])
     table.add_row(["ram", f"{subscriber.ram} GB"])
     table.add_row(["hdd_count", f"{subscriber.hdd_count}"])
     table.add_row(["hdd_size", f"{subscriber.hdd_size} GB"])

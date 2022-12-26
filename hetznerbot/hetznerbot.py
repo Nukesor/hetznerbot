@@ -30,7 +30,7 @@ def init_app():
 
     # Create jobs
     job_queue = updater.job_queue
-    job_queue.run_repeating(process_all, interval=120, first=0, name="Process all")
+    job_queue.run_repeating(process_all, interval=120, first=5, name="Process all")
 
     # Create handler
     help_handler = CommandHandler("help", send_help_text, run_async=True)
