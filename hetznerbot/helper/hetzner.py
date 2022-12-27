@@ -51,7 +51,7 @@ def update_offers(session, incoming_offers):
 
         offer.cpu = incoming_offer["cpu"]
         offer.ram = incoming_offer["ram_size"]
-        offer.datacenter = incoming_offer["datacenter"][1]
+        offer.datacenter = incoming_offer["datacenter"]
 
         offer.hdd_count = incoming_offer["hdd_count"]
         offer.hdd_size = incoming_offer["hdd_size"]
