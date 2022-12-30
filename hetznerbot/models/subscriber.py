@@ -22,9 +22,10 @@ class Subscriber(base):
     ram = Column(Integer, nullable=False, default=16)
     datacenter = Column(String, nullable=True)
 
-    ecc = Column(Boolean, nullable=False, default=False)
-    inic = Column(Boolean, nullable=False, default=False)
-    hwr = Column(Boolean, nullable=False, default=False)
+    ipv4 = Column(Boolean, nullable=False, server_default="FALSE")
+    ecc = Column(Boolean, nullable=False, server_default="FALSE")
+    inic = Column(Boolean, nullable=False, server_default="FALSE")
+    hwr = Column(Boolean, nullable=False, server_default="FALSE")
 
     authorized = Column(Boolean, nullable=False, server_default="FALSE", default=False)
 

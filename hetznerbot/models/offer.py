@@ -11,7 +11,7 @@ class Offer(base):
     __tablename__ = "offer"
 
     id = Column(Integer, primary_key=True)
-    deactivated = Column(Boolean, nullable=False, default=False)
+    deactivated = Column(Boolean, nullable=False, server_default="FALSE")
 
     cpu = Column(String, nullable=False)
     ram = Column(Integer, nullable=False)
@@ -20,9 +20,11 @@ class Offer(base):
     hdd_count = Column(Integer, nullable=False)
     hdd_size = Column(Float, nullable=False)
 
-    ecc = Column(Boolean, nullable=False, default=False)
-    inic = Column(Boolean, nullable=False, default=False)
-    hwr = Column(Boolean, nullable=False, default=False)
+    # Specials
+    ecc = Column(Boolean, nullable=False, server_default="FALSE")
+    inic = Column(Boolean, nullable=False, server_default="FALSE")
+    hwr = Column(Boolean, nullable=False, server_default="FALSE")
+    ipv4 = Column(Boolean, nullable=False, server_default="FALSE")
 
     price = Column(Integer, nullable=False)
     last_update = Column(DateTime, server_default=func.now(), nullable=False)

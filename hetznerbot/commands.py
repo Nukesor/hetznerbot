@@ -44,6 +44,7 @@ def set_parameter(bot, update, session, subscriber):
         "datacenter",
         "ram",
         "price",
+        "ipv4",
         "ecc",
         "inic",
         "hwr",
@@ -104,7 +105,7 @@ def set_parameter(bot, update, session, subscriber):
             return
 
     # Validate boolean values
-    if name in ["ecc", "inic", "hwr"]:
+    if name in ["ecc", "inic", "hwr", "ipv4"]:
         if value not in [0, 1]:
             chat.send_message("The value needs to be a boolean (0 or 1)")
             return

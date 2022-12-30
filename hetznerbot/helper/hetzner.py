@@ -3,7 +3,6 @@ import json
 import time
 from json import JSONDecodeError
 
-import dateparser
 import telegram
 from requests import request
 from requests.exceptions import ConnectionError
@@ -56,7 +55,9 @@ def update_offers(session, incoming_offers):
         offer.hdd_count = incoming_offer["hdd_count"]
         offer.hdd_size = incoming_offer["hdd_size"]
 
+        # Check for specials on this offer.
         offer.ecc = incoming_offer["is_ecc"]
+        offer.ipv4 = "IPv4" in incoming_offer["specials"]
         offer.inic = "iNIC" in incoming_offer["specials"]
         offer.hwr = "HWR" in incoming_offer["specials"]
 
@@ -117,6 +118,9 @@ def check_offer_for_subscriber(session, subscriber):
     if subscriber.datacenter is not None:
         query = query.filter(Offer.datacenter != subscriber.datacenter)
 
+    if subscriber.ipv4:
+        query = query.filter(Offer.ipv4.is_(True))
+
     if subscriber.ecc:
         query = query.filter(Offer.ecc.is_(True))
 
@@ -166,6 +170,8 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
 
         # Format extra features
         extra_features = ""
+        if offer.ipv4:
+            extra_features += "IPv4 "
         if offer.ecc:
             extra_features += "ECC "
         if offer.inic:
