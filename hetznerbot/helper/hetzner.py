@@ -47,6 +47,7 @@ def update_offers(session, incoming_offers):
 
         if not offer:
             offer = Offer(incoming_offer["key"])
+            session.add(offer)
 
         offer.cpu = incoming_offer["cpu"]
         offer.ram = incoming_offer["ram_size"]
@@ -64,13 +65,14 @@ def update_offers(session, incoming_offers):
         # Notify all subscribers about the price change
         price = int(float(incoming_offer["price"]))
         if offer.price is not None and offer.price != price:
-            for offer_subscriber in offer.offer_subscriber:
-                offer_subscriber.notified = False
+            # Mark the offer as "not new"
+            offer.new = False
+            for subscriber in offer.offer_subscriber:
+                subscriber.notified = False
 
         offer.price = price
 
         offer.deactivated = False
-        session.add(offer)
         offers.append(offer)
 
     session.commit()
@@ -133,11 +135,12 @@ def check_offer_for_subscriber(session, subscriber):
     matching_offers = query.all()
 
     for offer in matching_offers:
-        # There is no relation yet. Create a new OfferSubscriber entity
+        # Check if there's already a relation relation.
         exists = list(
             filter(lambda o: o.offer_id == offer.id, subscriber.offer_subscriber)
         )
 
+        # If not, create a new OfferSubscriber entity.
         if len(exists) == 0:
             offer_subscriber = OfferSubscriber(offer.id, subscriber.chat_id)
             subscriber.offer_subscriber.append(offer_subscriber)
@@ -168,6 +171,12 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
         offer_subscriber.notified = True
         offer = offer_subscriber.offer
 
+        # Whether this is a new entry or a price reduction occured.
+        if offer.new:
+            offer_status = "(New)"
+        else:
+            offer_status = "(Price reduction)"
+
         # Format extra features
         extra_features = ""
         if offer.ipv4:
@@ -192,7 +201,7 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
             final_size = f"{size}GB total"
 
         vat_incl_price = float(offer.price) * 1.19
-        formatted_offer = f"""*Offer {offer.id}:*
+        formatted_offer = f"""*Offer {offer.id} {offer_status}:*
 _Cpu:_ {offer.cpu}
 _Ram:_ *{offer.ram} GB*
 _HD:_ {offer.hdd_count} drives with *{offer.hdd_size} GB* Capacity *({final_size})*
