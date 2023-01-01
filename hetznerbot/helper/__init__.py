@@ -19,8 +19,9 @@ Available commands:
         - `after_raid`   int (min size of raid after assembly in GB)
         - `ram`              int (min RAM size in GB)
         - `datacenter`   enum ('NBG', 'FSN', 'HEL', 'None')
-        - `inic [0,1]`  bool (1 if the offer has to have an iNIC)
+        - `ipv4 [0,1]`  bool (1 if the offer has to have a IPv4 address)
         - `ecc [0,1]`     bool (1 if the offer has to have ECC RAM)
+        - `inic [0,1]`  bool (1 if the offer has to have an iNIC)
         - `hwr [0,1]`     bool (1 if the offer has to have a HWR)
         - `price`            int (max Price in Euro)
 /get Check hetzner now!
@@ -39,6 +40,7 @@ def get_subscriber_info(subscriber):
     table.add_row(["hdd_size", f"{subscriber.hdd_size} GB"])
     table.add_row(["raid", f"{subscriber.raid}"])
     table.add_row(["after_raid", f"{subscriber.after_raid} GB"])
+    table.add_row(["IPv4", f"{subscriber.ipv4}"])
     table.add_row(["ecc", f"{subscriber.ecc}"])
     table.add_row(["inic", f"{subscriber.inic}"])
     table.add_row(["hwr", f"{subscriber.hwr}"])

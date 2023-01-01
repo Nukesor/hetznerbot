@@ -62,8 +62,13 @@ def update_offers(session, incoming_offers):
         offer.inic = "iNIC" in incoming_offer["specials"]
         offer.hwr = "HWR" in incoming_offer["specials"]
 
+        # Calculate the price in cents
+        price = incoming_offer["price"] * 100
+        if offer.ipv4:
+            # Ipv4 is an extra 1.70€
+            price += 170
+
         # Notify all subscribers about the price change
-        price = int(float(incoming_offer["price"]))
         if offer.price is not None and offer.price != price:
             # Mark the offer as "not new"
             offer.new = False
@@ -103,7 +108,7 @@ def check_offer_for_subscriber(session, subscriber):
     query = (
         session.query(Offer)
         .filter(Offer.deactivated.is_(False))
-        .filter(Offer.price <= subscriber.price)
+        .filter(Offer.price <= subscriber.price * 100)
         .filter(Offer.ram >= subscriber.ram)
         .filter(Offer.hdd_count >= subscriber.hdd_count)
         .filter(Offer.hdd_size >= subscriber.hdd_size)
@@ -200,13 +205,16 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
             size = offer.hdd_size * offer.hdd_count
             final_size = f"{size}GB total"
 
-        vat_incl_price = float(offer.price) * 1.19
+        # Calculate the price including VAT.
+        price = offer.price / 100
+        price_incl_vat = float(offer.price) * 1.19 / 100
+
         formatted_offer = f"""*Offer {offer.id} {offer_status}:*
 _Cpu:_ {offer.cpu}
 _Ram:_ *{offer.ram} GB*
 _HD:_ {offer.hdd_count} drives with *{offer.hdd_size} GB* Capacity *({final_size})*
 _Extra features:_ *{extra_features}*
-_Price:_ {offer.price}€ (VAT incl.: {vat_incl_price:.2f})
+_Price:_ {price:.2f}€ (VAT incl.: {price_incl_vat:.2f})
 _Datacenter:_ {offer.datacenter}"""
 
         formatted_offers.append(formatted_offer)

@@ -26,6 +26,7 @@ class Offer(base):
     hwr = Column(Boolean, nullable=False, server_default="FALSE")
     ipv4 = Column(Boolean, nullable=False, server_default="FALSE")
 
+    # Save the net price in cents
     price = Column(Integer, nullable=False)
     new = Column(Boolean, server_default="FALSE", nullable=False)
     last_update = Column(DateTime, server_default=func.now(), nullable=False)
