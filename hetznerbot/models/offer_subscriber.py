@@ -32,7 +32,8 @@ class OfferSubscriber(base):
         index=True,
         nullable=False,
     )
-    notified = Column(Boolean, server_default="false", default=False)
+    notified = Column(Boolean, server_default="FALSE", default=False, nullable=False)
+    new = Column(Boolean, server_default="FALSE", default=True, nullable=False)
 
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, onupdate=func.now())

@@ -28,7 +28,6 @@ class Offer(base):
 
     # Save the net price in cents
     price = Column(Integer, nullable=False)
-    new = Column(Boolean, server_default="FALSE", nullable=False)
     last_update = Column(DateTime, server_default=func.now(), nullable=False)
 
     offer_subscriber = relationship("OfferSubscriber", back_populates="offer")
@@ -36,4 +35,3 @@ class Offer(base):
     def __init__(self, offer_id):
         """Create a new subscriber."""
         self.id = offer_id
-        self.new = True

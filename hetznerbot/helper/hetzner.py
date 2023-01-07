@@ -71,9 +71,9 @@ def update_offers(session, incoming_offers):
         # Notify all subscribers about the price change
         if offer.price is not None and offer.price != price:
             # Mark the offer as "not new"
-            offer.new = False
-            for subscriber in offer.offer_subscriber:
-                subscriber.notified = False
+            for subscribtion in offer.offer_subscriber:
+                subscribtion.notified = False
+                subscribtion.new = False
 
         offer.price = price
 
@@ -177,7 +177,7 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
         offer = offer_subscriber.offer
 
         # Whether this is a new entry or a price reduction occured.
-        if offer.new:
+        if offer_subscriber.new:
             offer_status = "(New)"
         else:
             offer_status = "(Price reduction)"
