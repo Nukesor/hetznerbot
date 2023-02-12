@@ -39,10 +39,11 @@ def session_wrapper(send_message=True):
                 subscriber = Subscriber.get_or_create(session, update.message.chat_id)
 
                 username = update.message.from_user.username
+                if username is not None:
+                    username = username.lower()
                 if (
                     not subscriber.authorized
-                    and username is not None
-                    and username.lower() != config["telegram"]["admin"]
+                    and username != config["telegram"]["admin"]
                 ):
                     update.message.chat.send_message(
                         "Sorry. Hetznerbot is no longer public."
