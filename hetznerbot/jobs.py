@@ -21,7 +21,12 @@ def process_all(context, session):
     update_offers(session, incoming_offers)
     check_offers_for_subscribers(session)
 
-    subscribers = session.query(Subscriber).filter(Subscriber.active.is_(True)).all()
+    subscribers = (
+        session.query(Subscriber)
+        .filter(Subscriber.authorized.is_(True))
+        .filter(Subscriber.active.is_(True))
+        .all()
+    )
     for subscriber in subscribers:
         try:
             send_offers(context.bot, subscriber, session)

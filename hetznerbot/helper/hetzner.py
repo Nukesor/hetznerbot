@@ -97,7 +97,12 @@ def check_all_offers_for_subscriber(session, subscriber):
 
 def check_offers_for_subscribers(session):
     """Check for each offer if any subscriber are interested in it."""
-    subscribers = session.query(Subscriber).filter(Subscriber.active.is_(True)).all()
+    subscribers = (
+        session.query(Subscriber)
+        .filter(Subscriber.authorized.is_(True))
+        .filter(Subscriber.active.is_(True))
+        .all()
+    )
 
     for subscriber in subscribers:
         check_offer_for_subscriber(session, subscriber)
