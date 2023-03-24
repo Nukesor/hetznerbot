@@ -11,10 +11,10 @@ from hetznerbot.sentry import sentry
 def job_session_wrapper(func):
     """Create a session and handle exceptions for jobs."""
 
-    def wrapper(context):
+    async def wrapper(context):
         session = get_session()
         try:
-            func(context, session)
+            await func(context, session)
 
             session.commit()
         except:  # noqa
@@ -33,7 +33,7 @@ def session_wrapper(send_message=True):
         """Create a database session and handle exceptions."""
 
         @wraps(func)
-        def wrapper(update, context):
+        async def wrapper(update, context):
             session = get_session()
             try:
                 subscriber = Subscriber.get_or_create(session, update.message.chat_id)
@@ -45,16 +45,16 @@ def session_wrapper(send_message=True):
                     not subscriber.authorized
                     and username != config["telegram"]["admin"]
                 ):
-                    update.message.chat.send_message(
+                    await update.message.chat.send_message(
                         "Sorry. Hetznerbot is no longer public."
                     )
                     return
 
-                func(context.bot, update, session, subscriber)
+                await func(context.bot, update, session, subscriber)
                 session.commit()
             except:  # noqa E722
                 if send_message:
-                    context.bot.sendMessage(
+                    await context.bot.sendMessage(
                         chat_id=update.message.chat_id,
                         text="An unknown error occurred.",
                     )

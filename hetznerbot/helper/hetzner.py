@@ -89,7 +89,7 @@ def update_offers(session, incoming_offers):
         update(Offer)
         .where(Offer.deactivated.is_(False))
         .where(Offer.id.notin_(ids))
-        .values(deactivated= True),
+        .values(deactivated=True),
     )
 
     return offers
@@ -237,7 +237,7 @@ _Datacenter:_ {offer.datacenter}"""
     return formatted_offers
 
 
-def send_offers(bot, subscriber, session, get_all=False):
+async def send_offers(bot, subscriber, session, get_all=False):
     """Send the newest update to all subscribers."""
     # Extract message meta data
     if get_all:
@@ -250,24 +250,24 @@ def send_offers(bot, subscriber, session, get_all=False):
     if len(formatted_offers) > 0:
         for chunk in formatted_offers:
             try:
-                bot.sendMessage(
+                await bot.sendMessage(
                     chat_id=subscriber.chat_id,
                     text=chunk,
                     parse_mode="Markdown",
                 )
-            except telegram.error.Unauthorized:
+            except telegram.error.Forbidden:
                 session.delete(subscriber)
                 session.commit()
 
         if formatted_offers == 5:
-            bot.sendMessage(
+            await bot.sendMessage(
                 chat_id=subscriber.chat_id,
                 text="Too many results, please narrow down your search a little.",
             )
             return
     else:
         if get_all:
-            bot.sendMessage(
+            await bot.sendMessage(
                 chat_id=subscriber.chat_id,
                 parse_mode="Markdown",
                 text="There are currently no offers for your criteria.",

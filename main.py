@@ -56,14 +56,14 @@ def initdb(exist_ok: bool = False, drop_existing: bool = False):
 @cli.command()
 def run():
     """Actually start the bot."""
-    updater = init_app()
+    app = init_app()
 
     if config["webhook"]["enabled"]:
         typer.echo("Starting the bot in webhook mode.")
         domain = config["webhook"]["domain"]
         token = config["webhook"]["token"]
         print("Starting up")
-        updater.start_webhook(
+        app.run_webhook(
             listen="127.0.0.1",
             port=config["webhook"]["port"],
             url_path=config["webhook"]["token"],
@@ -72,9 +72,7 @@ def run():
         )
     else:
         typer.echo("Starting the bot in polling mode.")
-        updater.start_polling()
-        print("Starting up")
-        updater.idle()
+        app.run_polling()
 
 
 if __name__ == "__main__":

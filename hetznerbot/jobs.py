@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from telegram.error import BadRequest, Unauthorized
+from telegram.error import BadRequest, Forbidden
 
 from hetznerbot.helper.hetzner import (
     check_offers_for_subscribers,
@@ -12,7 +12,7 @@ from hetznerbot.models import Subscriber
 
 
 @job_session_wrapper
-def process_all(context, session):
+async def process_all(context, session):
     """Check for every subscriber."""
     # Get hetzner offers. Early return if it doesn't work
     incoming_offers = get_hetzner_offers()
@@ -32,12 +32,12 @@ def process_all(context, session):
     for subscriber in subscribers:
         subscriber = subscriber[0]
         try:
-            send_offers(context.bot, subscriber, session)
+            await send_offers(context.bot, subscriber, session)
         except BadRequest as e:
             if e.message == "Chat not found":
                 session.delete(subscriber)
                 session.commit()
         # Bot was removed from group
-        except Unauthorized:
+        except Forbidden:
             session.delete(subscriber)
             session.commit()
