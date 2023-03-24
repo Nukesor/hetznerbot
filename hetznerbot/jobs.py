@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from telegram.error import BadRequest, Unauthorized
 
 from hetznerbot.helper.hetzner import (
@@ -21,13 +22,15 @@ def process_all(context, session):
     update_offers(session, incoming_offers)
     check_offers_for_subscribers(session)
 
-    subscribers = (
-        session.query(Subscriber)
+    query = (
+        select(Subscriber)
         .filter(Subscriber.authorized.is_(True))
         .filter(Subscriber.active.is_(True))
-        .all()
     )
+
+    subscribers = session.execute(query).all()
     for subscriber in subscribers:
+        subscriber = subscriber[0]
         try:
             send_offers(context.bot, subscriber, session)
         except BadRequest as e:

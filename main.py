@@ -47,7 +47,7 @@ def initdb(exist_ok: bool = False, drop_existing: bool = False):
         pass
 
     with wrap_echo("Creating metadata"):
-        base.metadata.create_all()
+        base.metadata.create_all(bind=engine)
         pass
 
     typer.echo("Database initialization complete.")

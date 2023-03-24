@@ -40,11 +40,11 @@ class Subscriber(base):
     @staticmethod
     def get_or_create(session, chat_id):
         """Get or create a new subscriber."""
-        subscriber = session.query(Subscriber).get(chat_id)
+        subscriber = session.get(Subscriber, chat_id)
         if not subscriber:
             subscriber = Subscriber(chat_id)
             session.add(subscriber)
             session.commit()
-            subscriber = session.query(Subscriber).get(chat_id)
+            subscriber = session.get(Subscriber, chat_id)
 
         return subscriber

@@ -6,6 +6,7 @@ from json import JSONDecodeError
 import telegram
 from requests import request
 from requests.exceptions import ConnectionError
+from sqlalchemy import select, update
 
 from hetznerbot.helper.text import split_text
 from hetznerbot.models import Offer, OfferSubscriber, Subscriber
@@ -42,7 +43,7 @@ def update_offers(session, incoming_offers):
 
     for incoming_offer in incoming_offers:
         ids.append(incoming_offer["key"])
-        offer = session.query(Offer).get(incoming_offer["key"])
+        offer = session.get(Offer, incoming_offer["key"])
 
         if not offer:
             offer = Offer(incoming_offer["key"])
@@ -82,9 +83,12 @@ def update_offers(session, incoming_offers):
     session.commit()
 
     # Deactivate all old offers
-    session.query(Offer).filter(Offer.deactivated.is_(False)).filter(
-        Offer.id.notin_(ids)
-    ).update({"deactivated": True}, synchronize_session="fetch")
+    session.execute(
+        update(Offer)
+        .where(Offer.deactivated.is_(False))
+        .where(Offer.id.notin_(ids))
+        .values(deactivated= True),
+    )
 
     return offers
 
@@ -96,21 +100,22 @@ def check_all_offers_for_subscriber(session, subscriber):
 
 def check_offers_for_subscribers(session):
     """Check for each offer if any subscriber are interested in it."""
-    subscribers = (
-        session.query(Subscriber)
+    query = (
+        select(Subscriber)
         .filter(Subscriber.authorized.is_(True))
         .filter(Subscriber.active.is_(True))
-        .all()
     )
 
+    subscribers = session.execute(query).all()
     for subscriber in subscribers:
+        subscriber = subscriber[0]
         check_offer_for_subscriber(session, subscriber)
 
 
 def check_offer_for_subscriber(session, subscriber):
     """Check the offers for a specific subscriber."""
     query = (
-        session.query(Offer)
+        select(Offer)
         .filter(Offer.deactivated.is_(False))
         .filter(Offer.price <= subscriber.price * 100)
         .filter(Offer.ram >= subscriber.ram)
@@ -141,7 +146,8 @@ def check_offer_for_subscriber(session, subscriber):
     if subscriber.hwr:
         query = query.filter(Offer.hwr.is_(True))
 
-    matching_offers = query.all()
+    results = session.execute(query).all()
+    matching_offers = [result[0] for result in results]
 
     for offer in matching_offers:
         # Check if there's already a relation relation.
