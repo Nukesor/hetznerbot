@@ -219,7 +219,8 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
         price = offer.price / 100
         price_incl_vat = float(offer.price) * 1.19 / 100
 
-        formatted_offer = f"""*Offer {offer.id} {offer_status}:*
+        updated_date = offer.last_update.strftime("%d.%m - %H:%M")
+        formatted_offer = f"""*Offer {offer.id} {offer_status}:* \[ {updated_date} ]
 _Cpu:_ {offer.cpu}
 _Ram:_ *{offer.ram} GB*
 _HD:_ {offer.hdd_count} drives with *{offer.hdd_size} GB* Capacity *({final_size})*
