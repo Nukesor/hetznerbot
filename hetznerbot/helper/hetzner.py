@@ -39,11 +39,11 @@ def get_hetzner_offers():
 
 def update_offers(session, incoming_offers):
     """Update all offers and check for updates."""
-    ids = []
+    active_ids = []
     offers = []
 
     for incoming_offer in incoming_offers:
-        ids.append(incoming_offer["key"])
+        active_ids.append(incoming_offer["key"])
         offer = session.get(Offer, incoming_offer["key"])
 
         if not offer:
@@ -73,24 +73,24 @@ def update_offers(session, incoming_offers):
         if offer.price is not None and offer.price != price:
             offer.last_update = datetime.now()
             # Mark the offer as "not new"
-            for subscribtion in offer.offer_subscriber:
-                subscribtion.notified = False
-                subscribtion.new = False
+            for subscription in offer.offer_subscriber:
+                subscription.notified = False
+                subscription.new = False
 
         offer.price = price
 
         offer.deactivated = False
         offers.append(offer)
 
-    session.commit()
-
     # Deactivate all old offers
     session.execute(
         update(Offer)
         .where(Offer.deactivated.is_(False))
-        .where(Offer.id.notin_(ids))
+        .where(Offer.id.notin_(active_ids))
         .values(deactivated=True),
     )
+
+    session.commit()
 
     return offers
 
@@ -161,9 +161,9 @@ def check_offer_for_subscriber(session, subscriber):
         if len(exists) == 0:
             offer_subscriber = OfferSubscriber(offer.id, subscriber.chat_id)
             subscriber.offer_subscriber.append(offer_subscriber)
-            session.add(offer_subscriber)
 
-        session.commit()
+            session.add(offer_subscriber)
+            session.commit()
 
     # Clean old entries
     for offer_subscriber in subscriber.offer_subscriber:

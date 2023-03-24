@@ -28,9 +28,9 @@ async def process_all(context, session):
         .filter(Subscriber.active.is_(True))
     )
 
-    subscribers = session.execute(query).all()
+    results = session.execute(query).all()
+    subscribers = [result[0] for result in results]
     for subscriber in subscribers:
-        subscriber = subscriber[0]
         try:
             await send_offers(context.bot, subscriber, session)
         except BadRequest as e:
