@@ -16,7 +16,6 @@ def get_hetzner_offers():
     """Get the newest hetzner offers."""
     headers = {
         "Content-Type": "application/json, text/plain, */*",
-        "Accept-Encoding": "gzip,deflate,br",
         "Referer": "https://www.hetzner.de/sb",
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36",
     }
@@ -31,7 +30,7 @@ def get_hetzner_offers():
     except ConnectionError:
         print("Connection error while retrieving data.")
         return None
-    except JSONDecodeError:
+    except JSONDecodeError or UnicodeDecodeError:
         sentry.capture_exception()
         return None
 
