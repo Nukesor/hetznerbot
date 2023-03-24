@@ -1,4 +1,5 @@
 """Hetzner helper functions."""
+from datetime import datetime
 import json
 import time
 from json import JSONDecodeError
@@ -70,6 +71,7 @@ def update_offers(session, incoming_offers):
 
         # Notify all subscribers about the price change
         if offer.price is not None and offer.price != price:
+            offer.last_update = datetime.now()
             # Mark the offer as "not new"
             for subscribtion in offer.offer_subscriber:
                 subscribtion.notified = False
