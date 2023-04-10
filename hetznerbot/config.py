@@ -11,7 +11,7 @@ default_config = {
         "admin": "nukesor",
     },
     "database": {
-        "sql_uri": "sqlite:///hetznerbot",
+        "sql_uri": "postgresql://localhost/hetznerbot",
     },
     "logging": {
         "sentry_enabled": False,

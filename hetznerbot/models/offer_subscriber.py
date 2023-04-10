@@ -1,4 +1,3 @@
-"""The sqlite model for a subscriber."""
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -15,7 +14,7 @@ from hetznerbot.db import base
 
 
 class OfferSubscriber(base):
-    """The sqlite model for the relationship between offers and subscribers."""
+    """The database model for the relationship between offers and subscribers."""
 
     __tablename__ = "offer_subscriber"
     __table_args__ = (

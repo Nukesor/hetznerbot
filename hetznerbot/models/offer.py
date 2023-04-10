@@ -1,4 +1,3 @@
-"""The sqlite model for a subscriber."""
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, func
 from sqlalchemy.orm import relationship
 
@@ -6,7 +5,7 @@ from hetznerbot.db import base
 
 
 class Offer(base):
-    """The sqlite model for an offer."""
+    """The database model for an offer."""
 
     __tablename__ = "offer"
 

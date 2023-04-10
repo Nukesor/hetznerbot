@@ -1,4 +1,3 @@
-"""The sqlite model for a subscriber."""
 from sqlalchemy import BigInteger, Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 
@@ -6,7 +5,7 @@ from hetznerbot.db import base
 
 
 class Subscriber(base):
-    """The sqlite model for a subscriber."""
+    """The database model for a subscriber."""
 
     __tablename__ = "subscriber"
 
