@@ -31,6 +31,8 @@ class Offer(base):
 
     offer_subscriber = relationship("OfferSubscriber", back_populates="offer")
 
+    offer_disks = relationship("OfferDisk", back_populates="offer")
+
     def __init__(self, offer_id):
         """Create a new subscriber."""
         self.id = offer_id
