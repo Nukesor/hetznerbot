@@ -10,6 +10,9 @@ initdb *args:
 migrate:
     poetry run alembic --config migrations/alembic.ini upgrade head
 
+generate-migration *args:
+    poetry run alembic --config migrations/alembic.ini revision --autogenerate {{ args }}
+
 setup:
     poetry install
 
