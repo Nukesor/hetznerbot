@@ -264,7 +264,7 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
         biggest_raid_6_pool = None
         disk_info = ''
         for offer_disk in offer.offer_disks:
-            disk_info += f"\n- {offer_disk.amount}x *{offer_disk.size} GB* {get_disk_type_name(offer_disk.type)}"
+            disk_info += f"\n- {offer_disk.amount}x *{format_size(offer_disk.size)}* {get_disk_type_name(offer_disk.type)}"
             if offer_disk.amount >= 3:
                 raid_5_pool = offer_disk.size * (offer_disk.amount - 1)
                 if not biggest_raid_5_pool or raid_5_pool > biggest_raid_5_pool:
@@ -288,10 +288,10 @@ _Disks:_ {disk_info}"""
 
         # Add raid info, if desired
         if subscriber.raid == 'raid5':
-            pool_string = f'{biggest_raid_5_pool} GB' if biggest_raid_5_pool else 'n/a'
+            pool_string = f'{format_size(biggest_raid_5_pool)}' if biggest_raid_5_pool else 'n/a'
             formatted_offer += f"\n_Raid5 capacity:_ *{pool_string}*"
         elif subscriber.raid == 'raid6':
-            pool_string = f'{biggest_raid_6_pool} GB' if biggest_raid_6_pool else 'n/a'
+            pool_string = f'{format_size(biggest_raid_6_pool)}' if biggest_raid_6_pool else 'n/a'
             formatted_offer += f"\n_Raid6 capacity:_ *{pool_string}*"
 
         # Remaining chunk of data
@@ -315,6 +315,13 @@ def get_disk_type_name(disk_type: DiskType) -> str:
         return 'SSD (Sata)'
     elif disk_type == DiskType.nvme:
         return 'SSD (NVMe)'
+
+
+def format_size(disk_size: int) -> str:
+    if disk_size < 1000:
+        return f'{disk_size} GB'
+    else:
+        return f'{disk_size / 1000} TB'
 
 
 async def send_offers(bot, subscriber, session, get_all=False):
