@@ -1,16 +1,18 @@
 """Hetzner helper functions."""
-from datetime import datetime
 import json
 import time
+from datetime import datetime
 from json import JSONDecodeError
 
 import telegram
 from requests import request
 from requests.exceptions import ConnectionError
 from sqlalchemy import select, update
+from sqlalchemy.sql.selectable import and_
 
+from hetznerbot.helper.disk_type import DiskType
 from hetznerbot.helper.text import split_text
-from hetznerbot.models import Offer, OfferSubscriber, Subscriber
+from hetznerbot.models import Offer, OfferSubscriber, Subscriber, OfferDisk
 from hetznerbot.sentry import sentry
 
 
@@ -37,6 +39,23 @@ def get_hetzner_offers():
         return None
 
 
+def populate_disk_data(offer_id: int, disks: list[OfferDisk], disk_type: DiskType, disk_size_entry: int):
+    """Either increments the disk count of an existing member of `disks` or creates a new entry in it."""
+    # skip general, it just repeats the info of other more specific categories.
+    if disk_type == 'general':
+        return
+
+    # go through every disk entry
+    for disk in disks:
+        # if there's already a disk in the list that matches the current specifications, increment the count.
+        if disk.type == disk_type and disk.size == disk_size_entry:
+            disk.amount += 1
+            return
+
+    # if none of the existing disks matched, we create a new one.
+    disks.append(OfferDisk(offer_id, disk_type, disk_size_entry))
+
+
 def update_offers(session, incoming_offers):
     """Update all offers and check for updates."""
     active_ids = []
@@ -56,6 +75,26 @@ def update_offers(session, incoming_offers):
 
         offer.hdd_count = incoming_offer["hdd_count"]
         offer.hdd_size = incoming_offer["hdd_size"]
+
+        # clear out existing disk data
+        for offer_disk in offer.offer_disks:
+            session.delete(offer_disk)
+        offer.offer_disks.clear()
+
+        # generate new disk data
+        disks = []
+        for disk_type in incoming_offer['serverDiskData']:
+            # skip general, it just repeats the info of other more specific categories.
+            if disk_type == 'general':
+                continue
+
+            disk_array = incoming_offer['serverDiskData'][disk_type]
+            for disk_size_entry in disk_array:
+                populate_disk_data(offer.id, disks, disk_type, disk_size_entry)
+
+        # add new disks to the offer
+        for disk in disks:
+            offer.offer_disks.append(disk)
 
         # Check for specials on this offer.
         offer.ecc = incoming_offer["is_ecc"]
