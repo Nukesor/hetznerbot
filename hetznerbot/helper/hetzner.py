@@ -182,7 +182,7 @@ def check_offer_for_subscriber(session, subscriber):
             and_(
                 OfferDisk.type == DiskType.hdd,
                 (OfferDisk.size - 2) * OfferDisk.amount >= subscriber.after_raid,
-                )
+            )
         ))
 
     if subscriber.datacenter is not None:
@@ -259,34 +259,62 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
         if extra_features == "":
             extra_features = "None"
 
-        if subscriber.raid == "raid5":
-            size = offer.hdd_size * (offer.hdd_count - 1)
-            final_size = f"{size}GB post-raid5"
-        elif subscriber.raid == "raid6":
-            size = offer.hdd_size * (offer.hdd_count - 2)
-            final_size = f"{size}GB post-raid6"
-        else:
-            size = offer.hdd_size * offer.hdd_count
-            final_size = f"{size}GB total"
+        # Get info on disk sizes
+        biggest_raid_5_pool = None
+        biggest_raid_6_pool = None
+        disk_info = ''
+        for offer_disk in offer.offer_disks:
+            disk_info += f"\n- {offer_disk.amount}x *{offer_disk.size} GB* {get_disk_type_name(offer_disk.type)}"
+            if offer_disk.amount >= 3:
+                raid_5_pool = offer_disk.size * (offer_disk.amount - 1)
+                if not biggest_raid_5_pool or raid_5_pool > biggest_raid_5_pool:
+                    biggest_raid_5_pool = raid_5_pool
+
+            if offer_disk.amount >= 4:
+                raid_6_pool = offer_disk.size * (offer_disk.amount - 2)
+                if not biggest_raid_6_pool or raid_6_pool > biggest_raid_6_pool:
+                    biggest_raid_6_pool = raid_6_pool
 
         # Calculate the price including VAT.
         price = offer.price / 100
         price_incl_vat = float(offer.price) * 1.19 / 100
 
+        # First chunk of data
         updated_date = offer.last_update.strftime("%d.%m - %H:%M")
         formatted_offer = f"""*Offer {offer.id} {offer_status}:* \[ {updated_date} ]
 _Cpu:_ {offer.cpu}
 _Ram:_ *{offer.ram} GB*
-_HD:_ {offer.hdd_count} drives with *{offer.hdd_size} GB* Capacity *({final_size})*
+_Disks:_ {disk_info}"""
+
+        # Add raid info, if desired
+        if subscriber.raid == 'raid5':
+            pool_string = f'{biggest_raid_5_pool} GB' if biggest_raid_5_pool else 'n/a'
+            formatted_offer += f"\n_Raid5 capacity:_ *{pool_string}*"
+        elif subscriber.raid == 'raid6':
+            pool_string = f'{biggest_raid_6_pool} GB' if biggest_raid_6_pool else 'n/a'
+            formatted_offer += f"\n_Raid6 capacity:_ *{pool_string}*"
+
+        # Remaining chunk of data
+        formatted_offer += f"""
 _Extra features:_ *{extra_features}*
 _Price:_ {price:.2f}€ (VAT incl.: {price_incl_vat:.2f})
-_Datacenter:_ {offer.datacenter}"""
+_Datacenter:_ {offer.datacenter}
+        """
 
         formatted_offers.append(formatted_offer)
 
     formatted_offers = split_text(formatted_offers, max_chunks=5)
 
     return formatted_offers
+
+
+def get_disk_type_name(disk_type: DiskType) -> str:
+    if disk_type == DiskType.hdd:
+        return 'HDD'
+    elif disk_type == DiskType.sata:
+        return 'SSD (Sata)'
+    elif disk_type == DiskType.nvme:
+        return 'SSD (NVMe)'
 
 
 async def send_offers(bot, subscriber, session, get_all=False):
