@@ -160,17 +160,30 @@ def check_offer_for_subscriber(session, subscriber):
         .filter(Offer.deactivated.is_(False))
         .filter(Offer.price <= subscriber.price * 100)
         .filter(Offer.ram >= subscriber.ram)
-        .filter(Offer.hdd_count >= subscriber.hdd_count)
-        .filter(Offer.hdd_size >= subscriber.hdd_size)
+        .filter(Offer.offer_disks.any(
+            and_(
+                OfferDisk.type == DiskType.hdd,
+                OfferDisk.size >= subscriber.hdd_size,
+                OfferDisk.amount >= subscriber.hdd_count
+            )
+        ))
     )
 
     # Calculate after_raid
     if subscriber.raid == "raid5":
-        after_raid = (Offer.hdd_count - 1) * Offer.hdd_size
-        query = query.filter(subscriber.after_raid <= after_raid)
+        query = query.filter(Offer.offer_disks.any(
+            and_(
+                OfferDisk.type == DiskType.hdd,
+                (OfferDisk.size - 1) * OfferDisk.amount >= subscriber.after_raid,
+            )
+        ))
     elif subscriber.raid == "raid6":
-        after_raid = (Offer.hdd_count - 2) * Offer.hdd_size
-        query = query.filter(subscriber.after_raid <= after_raid)
+        query = query.filter(Offer.offer_disks.any(
+            and_(
+                OfferDisk.type == DiskType.hdd,
+                (OfferDisk.size - 2) * OfferDisk.amount >= subscriber.after_raid,
+                )
+        ))
 
     if subscriber.datacenter is not None:
         query = query.filter(Offer.datacenter != subscriber.datacenter)
