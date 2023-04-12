@@ -16,9 +16,6 @@ class Offer(base):
     ram = Column(Integer, nullable=False)
     datacenter = Column(String, nullable=True)
 
-    hdd_count = Column(Integer, nullable=False)
-    hdd_size = Column(Float, nullable=False)
-
     # Specials
     ecc = Column(Boolean, nullable=False, server_default="FALSE")
     inic = Column(Boolean, nullable=False, server_default="FALSE")

@@ -73,9 +73,6 @@ def update_offers(session, incoming_offers):
         offer.ram = incoming_offer["ram_size"]
         offer.datacenter = incoming_offer["datacenter"]
 
-        offer.hdd_count = incoming_offer["hdd_count"]
-        offer.hdd_size = incoming_offer["hdd_size"]
-
         # clear out existing disk data
         for offer_disk in offer.offer_disks:
             session.delete(offer_disk)
