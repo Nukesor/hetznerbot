@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, SmallInteger, ForeignKey, Enum
+from sqlalchemy import Column, Enum, ForeignKey, Integer, SmallInteger
 from sqlalchemy.orm import relationship
 
 from hetznerbot.db import base
@@ -16,7 +16,9 @@ class OfferDisk(base):
     size = Column(SmallInteger, nullable=False)
     amount = Column(SmallInteger, nullable=False)
 
-    offer_id = Column(Integer, ForeignKey("offer.id", ondelete="cascade"), index=True, nullable=False)
+    offer_id = Column(
+        Integer, ForeignKey("offer.id", ondelete="cascade"), index=True, nullable=False
+    )
     offer = relationship("Offer")
 
     def __init__(self, offer_id: int, disk_type: DiskType, size: int):
