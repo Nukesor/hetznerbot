@@ -189,7 +189,7 @@ def check_offer_for_subscriber(session, subscriber):
             Offer.offer_disks.any(
                 and_(
                     OfferDisk.type == DiskType.hdd,
-                    (OfferDisk.size - 1) * OfferDisk.amount >= subscriber.after_raid,
+                    (OfferDisk.amount - 1) * OfferDisk.size >= subscriber.after_raid,
                 )
             )
         )
@@ -198,7 +198,7 @@ def check_offer_for_subscriber(session, subscriber):
             Offer.offer_disks.any(
                 and_(
                     OfferDisk.type == DiskType.hdd,
-                    (OfferDisk.size - 2) * OfferDisk.amount >= subscriber.after_raid,
+                    (OfferDisk.amount - 2) * OfferDisk.size >= subscriber.after_raid,
                 )
             )
         )
