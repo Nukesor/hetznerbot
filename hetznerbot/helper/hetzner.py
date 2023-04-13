@@ -75,13 +75,8 @@ def update_offers(session, incoming_offers):
         offer.ram = incoming_offer["ram_size"]
         offer.datacenter = incoming_offer["datacenter"]
 
-        # clear out existing disk data
-        for offer_disk in offer.offer_disks:
-            session.delete(offer_disk)
-        offer.offer_disks.clear()
-
-        # generate new disk data
-        disks = []
+        # Generate disk data
+        new_disks = []
         for disk_type in incoming_offer["serverDiskData"]:
             # skip general, it just repeats the info of other more specific categories.
             if disk_type == "general":
@@ -89,11 +84,29 @@ def update_offers(session, incoming_offers):
 
             disk_array = incoming_offer["serverDiskData"][disk_type]
             for disk_size_entry in disk_array:
-                populate_disk_data(offer.id, disks, disk_type, disk_size_entry)
+                populate_disk_data(offer.id, new_disks, disk_type, disk_size_entry)
 
-        # add new disks to the offer
-        for disk in disks:
-            offer.offer_disks.append(disk)
+        # Create two sets, representing the old disk pool and the new disk pool.
+        old_disks_set = set(
+            [
+                f"{disks.type.name}-{disks.size}-{disks.amount}"
+                for disks in offer.offer_disks
+            ]
+        )
+        new_disks_set = set(
+            [f"{disks.type}-{disks.size}-{disks.amount}" for disks in new_disks]
+        )
+
+        # Check if the set of disks changed. If that's the case, update the disks
+        if old_disks_set != new_disks_set:
+            # clear out existing disk data
+            for offer_disk in offer.offer_disks:
+                session.delete(offer_disk)
+            offer.offer_disks.clear()
+
+            # add new disks to the offer
+            for disk in new_disks:
+                offer.offer_disks.append(disk)
 
         # Check for specials on this offer.
         offer.ecc = incoming_offer["is_ecc"]
@@ -286,7 +299,7 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
 
         # First chunk of data
         updated_date = offer.last_update.strftime("%d.%m - %H:%M")
-        formatted_offer = f"""*Offer {offer.id} {offer_status}:* \[ {updated_date} ]
+        formatted_offer = f"""*Offer {offer.id} {offer_status}:* [ {updated_date} ]
 _Cpu:_ {offer.cpu}
 _Ram:_ *{offer.ram} GB*
 _Disks:_ {disk_info}"""
