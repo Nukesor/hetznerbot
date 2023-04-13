@@ -12,7 +12,7 @@ from sqlalchemy.sql.selectable import and_
 
 from hetznerbot.helper.disk_type import DiskType
 from hetznerbot.helper.text import split_text
-from hetznerbot.models import Offer, OfferDisk, OfferSubscriber, Subscriber
+from hetznerbot.models import Cpu, Offer, OfferDisk, OfferSubscriber, Subscriber
 from hetznerbot.sentry import sentry
 
 
@@ -181,6 +181,16 @@ def check_offer_for_subscriber(session, subscriber):
                 )
             )
         )
+        .filter(
+            Offer.cpu.in_(
+                session.query(Cpu.name)
+                .filter(Cpu.cores >= subscriber.cores)
+                .filter(Cpu.threads >= subscriber.threads)
+                .filter(Cpu.release >= subscriber.release)
+                .filter(Cpu.multi_thread_rating >= subscriber.multi_rating)
+                .filter(Cpu.single_thread_rating >= subscriber.single_rating)
+            )
+        )
     )
 
     # Calculate after_raid
@@ -243,7 +253,7 @@ def check_offer_for_subscriber(session, subscriber):
     session.commit()
 
 
-def format_offers(subscriber, offer_subscriber, get_all=False):
+def format_offers(session, subscriber, offer_subscriber, get_all=False):
     """Format the found offers."""
     # Filter all offers, which aren't notified yet, if the user doesn't want all offers.
     if not get_all:
@@ -297,10 +307,15 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
         price = offer.price / 100
         price_incl_vat = float(offer.price) * 1.19 / 100
 
+        # Get cpu data
+        cpu = session.get(Cpu, offer.cpu)
+
         # First chunk of data
         updated_date = offer.last_update.strftime("%d.%m - %H:%M")
         formatted_offer = f"""*Offer {offer.id} {offer_status}:* [ {updated_date} ]
-_Cpu:_ {offer.cpu}
+_Cpu:_ {cpu.name} ({cpu.release})
+- *{cpu.cores}* cores, *{cpu.threads}* threads
+- Multi: *{cpu.multi_thread_rating}*, Single: *{cpu.single_thread_rating}*
 _Ram:_ *{offer.ram} GB*
 _Disks:_ {disk_info}"""
 
@@ -351,10 +366,12 @@ async def send_offers(bot, subscriber, session, get_all=False):
     # Extract message meta data
     if get_all:
         formatted_offers = format_offers(
-            subscriber, subscriber.offer_subscriber, get_all=True
+            session, subscriber, subscriber.offer_subscriber, get_all=True
         )
     else:
-        formatted_offers = format_offers(subscriber, subscriber.offer_subscriber)
+        formatted_offers = format_offers(
+            session, subscriber, subscriber.offer_subscriber
+        )
 
     if len(formatted_offers) > 0:
         for chunk in formatted_offers:
