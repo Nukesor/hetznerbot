@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, func
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
 from sqlalchemy.orm import relationship
 
 from hetznerbot.db import base
@@ -16,9 +16,6 @@ class Offer(base):
     ram = Column(Integer, nullable=False)
     datacenter = Column(String, nullable=True)
 
-    hdd_count = Column(Integer, nullable=False)
-    hdd_size = Column(Float, nullable=False)
-
     # Specials
     ecc = Column(Boolean, nullable=False, server_default="FALSE")
     inic = Column(Boolean, nullable=False, server_default="FALSE")
@@ -30,6 +27,8 @@ class Offer(base):
     last_update = Column(DateTime, server_default=func.now(), nullable=False)
 
     offer_subscriber = relationship("OfferSubscriber", back_populates="offer")
+
+    offer_disks = relationship("OfferDisk", back_populates="offer")
 
     def __init__(self, offer_id):
         """Create a new subscriber."""

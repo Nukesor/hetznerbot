@@ -1,16 +1,18 @@
 """Hetzner helper functions."""
-from datetime import datetime
 import json
 import time
+from datetime import datetime
 from json import JSONDecodeError
 
 import telegram
 from requests import request
 from requests.exceptions import ConnectionError
 from sqlalchemy import select, update
+from sqlalchemy.sql.selectable import and_
 
+from hetznerbot.helper.disk_type import DiskType
 from hetznerbot.helper.text import split_text
-from hetznerbot.models import Offer, OfferSubscriber, Subscriber
+from hetznerbot.models import Offer, OfferDisk, OfferSubscriber, Subscriber
 from hetznerbot.sentry import sentry
 
 
@@ -37,6 +39,25 @@ def get_hetzner_offers():
         return None
 
 
+def populate_disk_data(
+    offer_id: int, disks: list[OfferDisk], disk_type: DiskType, disk_size_entry: int
+):
+    """Either increments the disk count of an existing member of `disks` or creates a new entry in it."""
+    # skip general, it just repeats the info of other more specific categories.
+    if disk_type == "general":
+        return
+
+    # go through every disk entry
+    for disk in disks:
+        # if there's already a disk in the list that matches the current specifications, increment the count.
+        if disk.type == disk_type and disk.size == disk_size_entry:
+            disk.amount += 1
+            return
+
+    # if none of the existing disks matched, we create a new one.
+    disks.append(OfferDisk(offer_id, disk_type, disk_size_entry))
+
+
 def update_offers(session, incoming_offers):
     """Update all offers and check for updates."""
     active_ids = []
@@ -54,8 +75,38 @@ def update_offers(session, incoming_offers):
         offer.ram = incoming_offer["ram_size"]
         offer.datacenter = incoming_offer["datacenter"]
 
-        offer.hdd_count = incoming_offer["hdd_count"]
-        offer.hdd_size = incoming_offer["hdd_size"]
+        # Generate disk data
+        new_disks = []
+        for disk_type in incoming_offer["serverDiskData"]:
+            # skip general, it just repeats the info of other more specific categories.
+            if disk_type == "general":
+                continue
+
+            disk_array = incoming_offer["serverDiskData"][disk_type]
+            for disk_size_entry in disk_array:
+                populate_disk_data(offer.id, new_disks, disk_type, disk_size_entry)
+
+        # Create two sets, representing the old disk pool and the new disk pool.
+        old_disks_set = set(
+            [
+                f"{disks.type.name}-{disks.size}-{disks.amount}"
+                for disks in offer.offer_disks
+            ]
+        )
+        new_disks_set = set(
+            [f"{disks.type}-{disks.size}-{disks.amount}" for disks in new_disks]
+        )
+
+        # Check if the set of disks changed. If that's the case, update the disks
+        if old_disks_set != new_disks_set:
+            # clear out existing disk data
+            for offer_disk in offer.offer_disks:
+                session.delete(offer_disk)
+            offer.offer_disks.clear()
+
+            # add new disks to the offer
+            for disk in new_disks:
+                offer.offer_disks.append(disk)
 
         # Check for specials on this offer.
         offer.ecc = incoming_offer["is_ecc"]
@@ -121,17 +172,36 @@ def check_offer_for_subscriber(session, subscriber):
         .filter(Offer.deactivated.is_(False))
         .filter(Offer.price <= subscriber.price * 100)
         .filter(Offer.ram >= subscriber.ram)
-        .filter(Offer.hdd_count >= subscriber.hdd_count)
-        .filter(Offer.hdd_size >= subscriber.hdd_size)
+        .filter(
+            Offer.offer_disks.any(
+                and_(
+                    OfferDisk.type == DiskType.hdd,
+                    OfferDisk.size >= subscriber.hdd_size,
+                    OfferDisk.amount >= subscriber.hdd_count,
+                )
+            )
+        )
     )
 
     # Calculate after_raid
     if subscriber.raid == "raid5":
-        after_raid = (Offer.hdd_count - 1) * Offer.hdd_size
-        query = query.filter(subscriber.after_raid <= after_raid)
+        query = query.filter(
+            Offer.offer_disks.any(
+                and_(
+                    OfferDisk.type == DiskType.hdd,
+                    (OfferDisk.size - 1) * OfferDisk.amount >= subscriber.after_raid,
+                )
+            )
+        )
     elif subscriber.raid == "raid6":
-        after_raid = (Offer.hdd_count - 2) * Offer.hdd_size
-        query = query.filter(subscriber.after_raid <= after_raid)
+        query = query.filter(
+            Offer.offer_disks.any(
+                and_(
+                    OfferDisk.type == DiskType.hdd,
+                    (OfferDisk.size - 2) * OfferDisk.amount >= subscriber.after_raid,
+                )
+            )
+        )
 
     if subscriber.datacenter is not None:
         query = query.filter(Offer.datacenter != subscriber.datacenter)
@@ -207,34 +277,73 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
         if extra_features == "":
             extra_features = "None"
 
-        if subscriber.raid == "raid5":
-            size = offer.hdd_size * (offer.hdd_count - 1)
-            final_size = f"{size}GB post-raid5"
-        elif subscriber.raid == "raid6":
-            size = offer.hdd_size * (offer.hdd_count - 2)
-            final_size = f"{size}GB post-raid6"
-        else:
-            size = offer.hdd_size * offer.hdd_count
-            final_size = f"{size}GB total"
+        # Get info on disk sizes
+        biggest_raid_5_pool = None
+        biggest_raid_6_pool = None
+        disk_info = ""
+        for offer_disk in offer.offer_disks:
+            disk_info += f"\n- {offer_disk.amount}x *{format_size(offer_disk.size)}* {get_disk_type_name(offer_disk.type)}"
+            if offer_disk.amount >= 3:
+                raid_5_pool = offer_disk.size * (offer_disk.amount - 1)
+                if not biggest_raid_5_pool or raid_5_pool > biggest_raid_5_pool:
+                    biggest_raid_5_pool = raid_5_pool
+
+            if offer_disk.amount >= 4:
+                raid_6_pool = offer_disk.size * (offer_disk.amount - 2)
+                if not biggest_raid_6_pool or raid_6_pool > biggest_raid_6_pool:
+                    biggest_raid_6_pool = raid_6_pool
 
         # Calculate the price including VAT.
         price = offer.price / 100
         price_incl_vat = float(offer.price) * 1.19 / 100
 
+        # First chunk of data
         updated_date = offer.last_update.strftime("%d.%m - %H:%M")
-        formatted_offer = f"""*Offer {offer.id} {offer_status}:* \[ {updated_date} ]
+        formatted_offer = f"""*Offer {offer.id} {offer_status}:* [ {updated_date} ]
 _Cpu:_ {offer.cpu}
 _Ram:_ *{offer.ram} GB*
-_HD:_ {offer.hdd_count} drives with *{offer.hdd_size} GB* Capacity *({final_size})*
+_Disks:_ {disk_info}"""
+
+        # Add raid info, if desired
+        if subscriber.raid == "raid5":
+            pool_string = (
+                f"{format_size(biggest_raid_5_pool)}" if biggest_raid_5_pool else "n/a"
+            )
+            formatted_offer += f"\n_Raid5 capacity:_ *{pool_string}*"
+        elif subscriber.raid == "raid6":
+            pool_string = (
+                f"{format_size(biggest_raid_6_pool)}" if biggest_raid_6_pool else "n/a"
+            )
+            formatted_offer += f"\n_Raid6 capacity:_ *{pool_string}*"
+
+        # Remaining chunk of data
+        formatted_offer += f"""
 _Extra features:_ *{extra_features}*
 _Price:_ {price:.2f}€ (VAT incl.: {price_incl_vat:.2f})
-_Datacenter:_ {offer.datacenter}"""
+_Datacenter:_ {offer.datacenter}
+        """
 
         formatted_offers.append(formatted_offer)
 
     formatted_offers = split_text(formatted_offers, max_chunks=5)
 
     return formatted_offers
+
+
+def get_disk_type_name(disk_type: DiskType) -> str:
+    if disk_type == DiskType.hdd:
+        return "HDD"
+    elif disk_type == DiskType.sata:
+        return "SSD (Sata)"
+    elif disk_type == DiskType.nvme:
+        return "SSD (NVMe)"
+
+
+def format_size(disk_size: int) -> str:
+    if disk_size < 1000:
+        return f"{disk_size} GB"
+    else:
+        return f"{disk_size / 1000} TB"
 
 
 async def send_offers(bot, subscriber, session, get_all=False):
