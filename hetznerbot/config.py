@@ -9,6 +9,7 @@ default_config = {
         "api_key": "your_telegram_api_key",
         "worker_count": 5,
         "admin": "nukesor",
+        "admin_id": 123,
     },
     "database": {
         "sql_uri": "postgresql://localhost/hetznerbot",

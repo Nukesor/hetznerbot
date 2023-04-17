@@ -4,6 +4,7 @@ from telegram.error import BadRequest, Forbidden
 from hetznerbot.helper.hetzner import (
     check_offers_for_subscribers,
     get_hetzner_offers,
+    notify_about_new_cpu,
     send_offers,
     update_offers,
 )
@@ -21,6 +22,7 @@ async def process_all(context, session):
 
     update_offers(session, incoming_offers)
     check_offers_for_subscribers(session)
+    await notify_about_new_cpu(session, context.bot)
 
     query = (
         select(Subscriber)

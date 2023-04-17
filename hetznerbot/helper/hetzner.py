@@ -10,6 +10,7 @@ from requests.exceptions import ConnectionError
 from sqlalchemy import select, update
 from sqlalchemy.sql.selectable import and_
 
+from hetznerbot.config import config
 from hetznerbot.helper.disk_type import DiskType
 from hetznerbot.helper.text import split_text
 from hetznerbot.models import Cpu, Offer, OfferDisk, OfferSubscriber, Subscriber
@@ -250,6 +251,29 @@ def check_offer_for_subscriber(session, subscriber):
             session.delete(offer_subscriber)
 
     session.commit()
+
+
+async def notify_about_new_cpu(session, bot):
+    """Check for any cpu for which no stats are present. If so, let the admin know."""
+    query = (
+        select(Offer.cpu)
+        .distinct()
+        .filter(Offer.cpu.notin_(session.query(Cpu.cpu_name)))
+    )
+
+    new_cpus = session.execute(query).all()
+    if len(new_cpus) == 0:
+        return
+
+    info = "Please add info about these cpus:"
+    for cpu in new_cpus:
+        info += f"{cpu}\n"
+
+    await bot.sendMessage(
+        # todo how to get
+        chat_id=config["telegram"]["admin_id"],
+        text=info,
+    )
 
 
 def format_offers(session, subscriber, offer_subscriber, get_all=False):
