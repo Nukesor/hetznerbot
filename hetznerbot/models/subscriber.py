@@ -17,9 +17,8 @@ class Subscriber(base):
     raid = Column(String, default="raid5")
     after_raid = Column(Integer, nullable=False, default=4096)
 
-    cores = Column(Integer, nullable=False, default=4)
     threads = Column(Integer, nullable=False, default=8)
-    release = Column(Integer, nullable=False, default=2010)
+    release_date = Column(Integer, nullable=False, default=2010)
     multi_rating = Column(Integer, nullable=False, default=5000)
     single_rating = Column(Integer, nullable=False, default=1000)
 

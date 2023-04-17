@@ -183,10 +183,9 @@ def check_offer_for_subscriber(session, subscriber):
         )
         .filter(
             Offer.cpu.in_(
-                session.query(Cpu.name)
-                .filter(Cpu.cores >= subscriber.cores)
+                session.query(Cpu.cpu_name)
                 .filter(Cpu.threads >= subscriber.threads)
-                .filter(Cpu.release >= subscriber.release)
+                .filter(Cpu.release_date >= subscriber.release_date)
                 .filter(Cpu.multi_thread_rating >= subscriber.multi_rating)
                 .filter(Cpu.single_thread_rating >= subscriber.single_rating)
             )
@@ -292,7 +291,7 @@ def format_offers(session, subscriber, offer_subscriber, get_all=False):
         biggest_raid_6_pool = None
         disk_info = ""
         for offer_disk in offer.offer_disks:
-            disk_info += f"\n- {offer_disk.amount}x *{format_size(offer_disk.size)}* {get_disk_type_name(offer_disk.type)}"
+            disk_info += f"\n    - {offer_disk.amount}x *{format_size(offer_disk.size)}* {get_disk_type_name(offer_disk.type)}"
             if offer_disk.amount >= 3:
                 raid_5_pool = offer_disk.size * (offer_disk.amount - 1)
                 if not biggest_raid_5_pool or raid_5_pool > biggest_raid_5_pool:
@@ -307,17 +306,23 @@ def format_offers(session, subscriber, offer_subscriber, get_all=False):
         price = offer.price / 100
         price_incl_vat = float(offer.price) * 1.19 / 100
 
-        # Get cpu data
-        cpu = session.get(Cpu, offer.cpu)
-
         # First chunk of data
         updated_date = offer.last_update.strftime("%d.%m - %H:%M")
-        formatted_offer = f"""*Offer {offer.id} {offer_status}:* [ {updated_date} ]
-_Cpu:_ {cpu.name} ({cpu.release})
-- *{cpu.cores}* cores, *{cpu.threads}* threads
-- Multi: *{cpu.multi_thread_rating}*, Single: *{cpu.single_thread_rating}*
-_Ram:_ *{offer.ram} GB*
-_Disks:_ {disk_info}"""
+        formatted_offer = f"""*Offer {offer.id} {offer_status}:* [ {updated_date} ]"""
+
+        # Add cpu info, if possible
+        cpu = session.execute(select(Cpu).filter(Cpu.cpu_name.is_(offer.cpu))).scalar()
+        if not cpu:
+            formatted_offer += f"\n_Cpu:_ {offer.cpu}"
+        else:
+            formatted_offer += f"""\n_Cpu:_ {cpu.cpu_name} ({cpu.release_date})
+    - *{cpu.threads}* threads
+    - Multi: *{cpu.multi_thread_rating}*
+    - Single: *{cpu.single_thread_rating}*"""
+
+        # Add ram and disk info
+        formatted_offer += f"""\n_Ram:_ *{offer.ram} GB*
+_Disks:_{disk_info}"""
 
         # Add raid info, if desired
         if subscriber.raid == "raid5":

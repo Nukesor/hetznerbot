@@ -8,10 +8,9 @@ class Cpu(base):
 
     __tablename__ = "cpu"
 
-    name = Column(String, nullable=False, primary_key=True)
-    cores = Column(Integer, nullable=True)
+    cpu_name = Column(String, nullable=False, primary_key=True)
     threads = Column(Integer, nullable=True)
-    release = Column(Integer, nullable=True)
+    release_date = Column(Integer, nullable=True)
     multi_thread_rating = Column(Integer, nullable=True)
     single_thread_rating = Column(Integer, nullable=True)
 

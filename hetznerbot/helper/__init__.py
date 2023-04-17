@@ -13,17 +13,21 @@ Available commands:
 /stop Stop the bot
 /set Set attributes with this syntax: "\set hdd_count 3"
     Attributes are:
-        - `hdd_count`    int (min number of hard drives)
-        - `hdd_size`       int (min amount of GB for each disk)
-        - `raid`             enum ('raid5', 'raid6', 'None')
-        - `after_raid`   int (min size of raid after assembly in GB)
-        - `ram`              int (min RAM size in GB)
-        - `datacenter`   enum ('NBG', 'FSN', 'HEL', 'None')
-        - `ipv4 [0,1]`  bool (1 if the offer has to have a IPv4 address)
+        - `hdd_count`     int (min number of hard drives)
+        - `hdd_size`      int (min amount of GB for each disk)
+        - `raid`          enum ('raid5', 'raid6', 'None')
+        - `after_raid`    int (min size of raid after assembly in GB)
+        - `threads`       int (min number of cpu threads)
+        - `release_date`  int (earliest cpu release year)
+        - `multi_rating`  int (min passmark multithread rating)
+        - `single_rating` int (min passmark singlethread rating)
+        - `ram`           int (min RAM size in GB)
+        - `datacenter`    enum ('NBG', 'FSN', 'HEL', 'None')
+        - `ipv4 [0,1]`    bool (1 if the offer has to have a IPv4 address)
         - `ecc [0,1]`     bool (1 if the offer has to have ECC RAM)
-        - `inic [0,1]`  bool (1 if the offer has to have an iNIC)
+        - `inic [0,1]`    bool (1 if the offer has to have an iNIC)
         - `hwr [0,1]`     bool (1 if the offer has to have a HWR)
-        - `price`            int (max Price in Euro)
+        - `price`         int (max Price in Euro)
 /get Check hetzner now!
 /info Show the current search attributes.
 /help Show this text
@@ -40,9 +44,8 @@ def get_subscriber_info(subscriber):
     table.add_row(["hdd_size", f"{subscriber.hdd_size} GB"])
     table.add_row(["raid", f"{subscriber.raid}"])
     table.add_row(["after_raid", f"{subscriber.after_raid} GB"])
-    table.add_row(["cores", f"{subscriber.cores}"])
     table.add_row(["threads", f"{subscriber.threads}"])
-    table.add_row(["release", f"{subscriber.release}"])
+    table.add_row(["release_date", f"{subscriber.release_date}"])
     table.add_row(["multi_rating", f"{subscriber.multi_rating}"])
     table.add_row(["single_rating", f"{subscriber.single_rating}"])
     table.add_row(["IPv4", f"{subscriber.ipv4}"])
