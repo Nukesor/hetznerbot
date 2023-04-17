@@ -1,6 +1,6 @@
 INSERT OR IGNORE INTO cpu(cpu_name,threads,release_date,multi_thread_rating,single_thread_rating) VALUES
 ("AMD EPYC 7401P",48,2017,28282,1698),
-("AMD Opteron 6338P",12,2014,NULL,NULL),
+("AMD Opteron 6338P",12,2014,0,0),
 ("AMD Ryzen 7 1700X",16,2017,15691,2979),
 ("AMD Ryzen 7 3700X",16,2019,22674,2664),
 ("AMD Ryzen 7 PRO 1700X",16,2017,15695,2148),

@@ -9,10 +9,10 @@ class Cpu(base):
     __tablename__ = "cpu"
 
     cpu_name = Column(String, nullable=False, primary_key=True)
-    threads = Column(Integer, nullable=True)
-    release_date = Column(Integer, nullable=True)
-    multi_thread_rating = Column(Integer, nullable=True)
-    single_thread_rating = Column(Integer, nullable=True)
+    threads = Column(Integer, nullable=False)
+    release_date = Column(Integer, nullable=False)
+    multi_thread_rating = Column(Integer, nullable=False)
+    single_thread_rating = Column(Integer, nullable=False)
 
     def __init__(self, name):
         """Create a new cpu."""
