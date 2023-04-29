@@ -18,15 +18,19 @@ Available commands:
 /stop Stop the bot
 /set Set search attributes with this syntax: "\set hdd_count 3"
     Attributes are:
-        - `hdd_count`    int (min number of hard drives)
-        - `hdd_size`     int (min amount of GB for each disk)
-        - `raid`        enum ('raid5', 'raid6', 'None')
-        - `after_raid`  int (min size of raid after assembly in TB)
-        - `ram`         int (min RAM size in GB)
-        - `price`       int (max Price in Euro)
-        - `ecc`         bool (0 or 1)
-        - `inic`        bool (0 or 1)
-        - `hwr`         bool (0 or 1)
+        - `hdd_count`     int (min number of hard drives)
+        - `hdd_size`      int (min amount of GB for each disk)
+        - `raid`          enum ('raid5', 'raid6', 'None')
+        - `after_raid`    int (min size of raid after assembly in TB)
+        - `threads`       int (min number of cpu threads)
+        - `release_date`  int (earliest cpu release year)
+        - `multi_rating`  int (min passmark multithread rating)
+        - `single_rating` int (min passmark singlethread rating)
+        - `ram`           int (min RAM size in GB)
+        - `price`         int (max Price in Euro)
+        - `ecc`           bool (0 or 1)
+        - `inic`          bool (0 or 1)
+        - `hwr`           bool (0 or 1)
 /get Check hetzner now!
 /info Show the current search attributes.
 /help Show this text

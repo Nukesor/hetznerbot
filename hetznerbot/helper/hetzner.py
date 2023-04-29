@@ -10,9 +10,10 @@ from requests.exceptions import ConnectionError
 from sqlalchemy import select, update
 from sqlalchemy.sql.selectable import and_
 
+from hetznerbot.config import config
 from hetznerbot.helper.disk_type import DiskType
 from hetznerbot.helper.text import split_text
-from hetznerbot.models import Offer, OfferDisk, OfferSubscriber, Subscriber
+from hetznerbot.models import Cpu, Offer, OfferDisk, OfferSubscriber, Subscriber
 from hetznerbot.sentry import sentry
 
 
@@ -71,7 +72,7 @@ def update_offers(session, incoming_offers):
             offer = Offer(incoming_offer["key"])
             session.add(offer)
 
-        offer.cpu = incoming_offer["cpu"]
+        offer.cpu = incoming_offer["cpu"].strip()
         offer.ram = incoming_offer["ram_size"]
         offer.datacenter = incoming_offer["datacenter"]
 
@@ -181,6 +182,15 @@ def check_offer_for_subscriber(session, subscriber):
                 )
             )
         )
+        .filter(
+            Offer.cpu.in_(
+                session.query(Cpu.name)
+                .filter(Cpu.threads >= subscriber.threads)
+                .filter(Cpu.release_date >= subscriber.release_date)
+                .filter(Cpu.multi_thread_rating >= subscriber.multi_rating)
+                .filter(Cpu.single_thread_rating >= subscriber.single_rating)
+            )
+        )
     )
 
     # Calculate after_raid
@@ -243,7 +253,35 @@ def check_offer_for_subscriber(session, subscriber):
     session.commit()
 
 
-def format_offers(subscriber, offer_subscriber, get_all=False):
+async def notify_about_new_cpu(context, session):
+    """Check for any cpu for which no stats are present. If so, let the admin know."""
+    query = (
+        select(Offer.cpu).distinct().filter(Offer.cpu.notin_(session.query(Cpu.name)))
+    )
+    new_cpus = session.execute(query).all()
+
+    # Remove all cpus from the list for which we've already been notified
+    if "new_cpus" not in context.bot_data:
+        context.bot_data["new_cpus"] = []
+    new_cpus = [cpu for cpu in new_cpus if cpu not in context.bot_data["new_cpus"]]
+
+    # Early return if there's nothing to do
+    if len(new_cpus) == 0:
+        return
+
+    # Build notification message
+    info = "Please add info about these cpus:\n"
+    for cpu in new_cpus:
+        info += f"'{cpu[0]}'\n"
+        context.bot_data["new_cpus"].append(cpu)
+
+    await context.bot.sendMessage(
+        chat_id=config["telegram"]["admin_id"],
+        text=info,
+    )
+
+
+def format_offers(session, subscriber, offer_subscriber, get_all=False):
     """Format the found offers."""
     # Filter all offers, which aren't notified yet, if the user doesn't want all offers.
     if not get_all:
@@ -282,7 +320,7 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
         biggest_raid_6_pool = None
         disk_info = ""
         for offer_disk in offer.offer_disks:
-            disk_info += f"\n- {offer_disk.amount}x *{format_size(offer_disk.size)}* {get_disk_type_name(offer_disk.type)}"
+            disk_info += f"\n    - {offer_disk.amount}x *{format_size(offer_disk.size)}* {get_disk_type_name(offer_disk.type)}"
             if offer_disk.amount >= 3:
                 raid_5_pool = offer_disk.size * (offer_disk.amount - 1)
                 if not biggest_raid_5_pool or raid_5_pool > biggest_raid_5_pool:
@@ -299,10 +337,21 @@ def format_offers(subscriber, offer_subscriber, get_all=False):
 
         # First chunk of data
         updated_date = offer.last_update.strftime("%d.%m - %H:%M")
-        formatted_offer = f"""*Offer {offer.id} {offer_status}:* [ {updated_date} ]
-_Cpu:_ {offer.cpu}
-_Ram:_ *{offer.ram} GB*
-_Disks:_ {disk_info}"""
+        formatted_offer = f"""*Offer {offer.id} {offer_status}:* [ {updated_date} ]"""
+
+        # Add cpu info, if possible
+        cpu = session.get(Cpu, offer.cpu)
+        if cpu is None:
+            formatted_offer += f"\n_Cpu:_ {offer.cpu}"
+        else:
+            formatted_offer += f"""\n_Cpu:_ {cpu.name} ({cpu.release_date})
+    - *{cpu.threads}* threads
+    - Multi: *{cpu.multi_thread_rating}*
+    - Single: *{cpu.single_thread_rating}*"""
+
+        # Add ram and disk info
+        formatted_offer += f"""\n_Ram:_ *{offer.ram} GB*
+_Disks:_{disk_info}"""
 
         # Add raid info, if desired
         if subscriber.raid == "raid5":
@@ -351,10 +400,12 @@ async def send_offers(bot, subscriber, session, get_all=False):
     # Extract message meta data
     if get_all:
         formatted_offers = format_offers(
-            subscriber, subscriber.offer_subscriber, get_all=True
+            session, subscriber, subscriber.offer_subscriber, get_all=True
         )
     else:
-        formatted_offers = format_offers(subscriber, subscriber.offer_subscriber)
+        formatted_offers = format_offers(
+            session, subscriber, subscriber.offer_subscriber
+        )
 
     if len(formatted_offers) > 0:
         for chunk in formatted_offers:
