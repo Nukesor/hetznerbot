@@ -72,7 +72,7 @@ def update_offers(session, incoming_offers):
             offer = Offer(incoming_offer["key"])
             session.add(offer)
 
-        offer.cpu = incoming_offer["cpu"]
+        offer.cpu = incoming_offer["cpu"].strip()
         offer.ram = incoming_offer["ram_size"]
         offer.datacenter = incoming_offer["datacenter"]
 
@@ -272,7 +272,7 @@ async def notify_about_new_cpu(context, session):
     # Build notification message
     info = "Please add info about these cpus:\n"
     for cpu in new_cpus:
-        info += f"{cpu[0]}\n"
+        info += f"'{cpu[0]}'\n"
         context.bot_data["new_cpus"].append(cpu)
 
     await context.bot.sendMessage(
