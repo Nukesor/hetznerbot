@@ -340,8 +340,8 @@ def format_offers(session, subscriber, offer_subscriber, get_all=False):
         formatted_offer = f"""*Offer {offer.id} {offer_status}:* [ {updated_date} ]"""
 
         # Add cpu info, if possible
-        cpu = session.execute(select(Cpu).filter(Cpu.name.is_(offer.cpu))).scalar()
-        if not cpu:
+        cpu = session.get(Cpu, offer.cpu)
+        if cpu is None:
             formatted_offer += f"\n_Cpu:_ {offer.cpu}"
         else:
             formatted_offer += f"""\n_Cpu:_ {cpu.name} ({cpu.release_date})
