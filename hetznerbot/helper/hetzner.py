@@ -253,24 +253,29 @@ def check_offer_for_subscriber(session, subscriber):
     session.commit()
 
 
-async def notify_about_new_cpu(session, bot):
+async def notify_about_new_cpu(context, session):
     """Check for any cpu for which no stats are present. If so, let the admin know."""
     query = (
-        select(Offer.cpu)
-        .distinct()
-        .filter(Offer.cpu.notin_(session.query(Cpu.name)))
+        select(Offer.cpu).distinct().filter(Offer.cpu.notin_(session.query(Cpu.name)))
     )
-
     new_cpus = session.execute(query).all()
+
+    # Remove all cpus from the list for which we've already been notified
+    if "new_cpus" not in context.bot_data:
+        context.bot_data["new_cpus"] = []
+    new_cpus = [cpu for cpu in new_cpus if cpu not in context.bot_data["new_cpus"]]
+
+    # Early return if there's nothing to do
     if len(new_cpus) == 0:
         return
 
-    info = "Please add info about these cpus:"
+    # Build notification message
+    info = "Please add info about these cpus:\n"
     for cpu in new_cpus:
-        info += f"{cpu}\n"
+        info += f"{cpu[0]}\n"
+        context.bot_data["new_cpus"].append(cpu)
 
-    await bot.sendMessage(
-        # todo how to get
+    await context.bot.sendMessage(
         chat_id=config["telegram"]["admin_id"],
         text=info,
     )

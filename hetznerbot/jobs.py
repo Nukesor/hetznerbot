@@ -22,7 +22,7 @@ async def process_all(context, session):
 
     update_offers(session, incoming_offers)
     check_offers_for_subscribers(session)
-    await notify_about_new_cpu(session, context.bot)
+    await notify_about_new_cpu(context, session)
 
     query = (
         select(Subscriber)
