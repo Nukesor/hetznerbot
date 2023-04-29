@@ -184,7 +184,7 @@ def check_offer_for_subscriber(session, subscriber):
         )
         .filter(
             Offer.cpu.in_(
-                session.query(Cpu.cpu_name)
+                session.query(Cpu.name)
                 .filter(Cpu.threads >= subscriber.threads)
                 .filter(Cpu.release_date >= subscriber.release_date)
                 .filter(Cpu.multi_thread_rating >= subscriber.multi_rating)
@@ -258,7 +258,7 @@ async def notify_about_new_cpu(session, bot):
     query = (
         select(Offer.cpu)
         .distinct()
-        .filter(Offer.cpu.notin_(session.query(Cpu.cpu_name)))
+        .filter(Offer.cpu.notin_(session.query(Cpu.name)))
     )
 
     new_cpus = session.execute(query).all()
@@ -335,11 +335,11 @@ def format_offers(session, subscriber, offer_subscriber, get_all=False):
         formatted_offer = f"""*Offer {offer.id} {offer_status}:* [ {updated_date} ]"""
 
         # Add cpu info, if possible
-        cpu = session.execute(select(Cpu).filter(Cpu.cpu_name.is_(offer.cpu))).scalar()
+        cpu = session.execute(select(Cpu).filter(Cpu.name.is_(offer.cpu))).scalar()
         if not cpu:
             formatted_offer += f"\n_Cpu:_ {offer.cpu}"
         else:
-            formatted_offer += f"""\n_Cpu:_ {cpu.cpu_name} ({cpu.release_date})
+            formatted_offer += f"""\n_Cpu:_ {cpu.name} ({cpu.release_date})
     - *{cpu.threads}* threads
     - Multi: *{cpu.multi_thread_rating}*
     - Single: *{cpu.single_thread_rating}*"""
