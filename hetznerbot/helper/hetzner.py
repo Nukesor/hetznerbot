@@ -160,9 +160,8 @@ def check_offers_for_subscribers(session):
         .filter(Subscriber.active.is_(True))
     )
 
-    subscribers = session.execute(query).all()
+    subscribers = session.scalars(query).all()
     for subscriber in subscribers:
-        subscriber = subscriber[0]
         check_offer_for_subscriber(session, subscriber)
 
 
@@ -228,9 +227,7 @@ def check_offer_for_subscriber(session, subscriber):
     if subscriber.hwr:
         query = query.filter(Offer.hwr.is_(True))
 
-    results = session.execute(query).all()
-    matching_offers = [result[0] for result in results]
-
+    matching_offers = session.scalars(query).all()
     for offer in matching_offers:
         # Check if there's already a relation relation.
         exists = list(
@@ -258,7 +255,7 @@ async def notify_about_new_cpu(context, session):
     query = (
         select(Offer.cpu).distinct().filter(Offer.cpu.notin_(session.query(Cpu.name)))
     )
-    new_cpus = session.execute(query).all()
+    new_cpus = session.scalars(query).all()
 
     # Remove all cpus from the list for which we've already been notified
     if "new_cpus" not in context.bot_data:
@@ -272,7 +269,7 @@ async def notify_about_new_cpu(context, session):
     # Build notification message
     info = "Please add info about these cpus:\n"
     for cpu in new_cpus:
-        info += f"'{cpu[0]}'\n"
+        info += f"'{cpu}'\n"
         context.bot_data["new_cpus"].append(cpu)
 
     await context.bot.sendMessage(

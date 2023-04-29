@@ -30,8 +30,7 @@ async def process_all(context, session):
         .filter(Subscriber.active.is_(True))
     )
 
-    results = session.execute(query).all()
-    subscribers = [result[0] for result in results]
+    subscribers = session.scalars(query).all()
     for subscriber in subscribers:
         try:
             await send_offers(context.bot, subscriber, session)
