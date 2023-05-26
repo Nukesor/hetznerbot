@@ -36,8 +36,6 @@ Available commands:
 /help Show this text
 ```
 
-Feel free to host your own or to use mine: @hetzner_offer_bot
-
 ## Installation and run
 
 **This bot is developed for Linux.**
