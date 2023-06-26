@@ -1,5 +1,7 @@
+from hetznerbot.models.subscriber import Subscriber
 from telegram.constants import ParseMode
 
+from hetznerbot.config import config
 from hetznerbot.helper import get_subscriber_info, help_text
 from hetznerbot.helper.hetzner import check_all_offers_for_subscriber, send_offers
 from hetznerbot.helper.session import session_wrapper
@@ -149,4 +151,33 @@ async def stop(bot, update, session, subscriber):
     session.commit()
 
     text = "You won't receive any more offers."
+    await bot.send_message(chat_id=update.message.chat_id, text=text)
+
+
+@session_wrapper()
+async def authorize(bot, update, session, subscriber):
+    """Stop the bot."""
+    if subscriber.chat_id != config["telegram"]["admin_id"]:
+        text = "You're not authorized to authorize other people."
+        await bot.send_message(chat_id=update.message.chat_id, text=text)
+        return
+
+    # Split the text to remove the command string
+    chat_id = update.message.text.split(" ")[1]
+
+    # Get the subscriber
+    target_subscriber = Subscriber.get_or_create(session, chat_id)
+
+    # Check if they are already authorized
+    if subscriber.authorized:
+        text = f"User {subscriber.chat_id} is already authorized."
+        await bot.send_message(chat_id=update.message.chat_id, text=text)
+        return
+
+    # Authorize and eventually create the subscriber
+    target_subscriber.authorized = True
+    session.add(subscriber)
+    session.commit()
+
+    text = f"User {subscriber.chat_id} has been authorized."
     await bot.send_message(chat_id=update.message.chat_id, text=text)

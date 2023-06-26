@@ -2,6 +2,7 @@
 from telegram.ext import Application, CommandHandler
 
 from hetznerbot.commands import (
+    authorize,
     get_offers,
     info,
     send_help_text,
@@ -39,6 +40,7 @@ def init_app():
     info_handler = CommandHandler("info", info, block=False)
     stop_handler = CommandHandler("stop", stop, block=False)
     start_handler = CommandHandler("start", start, block=False)
+    authorize_handler = CommandHandler("authorize", authorize, block=False)
 
     # Add handler
     app.add_handler(help_handler)
@@ -47,5 +49,6 @@ def init_app():
     app.add_handler(set_handler)
     app.add_handler(stop_handler)
     app.add_handler(start_handler)
+    app.add_handler(authorize_handler)
 
     return app

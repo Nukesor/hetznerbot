@@ -36,15 +36,19 @@ def session_wrapper(send_message=True):
         async def wrapper(update, context):
             session = get_session()
             try:
-                subscriber = Subscriber.get_or_create(session, update.message.chat_id)
-
+                chat_id = update.message.chat_id
                 username = update.message.from_user.username
                 if username is not None:
                     username = username.lower()
+
+                subscriber = Subscriber.get_or_create(session, chat_id)
+
                 if (
                     not subscriber.authorized
-                    and username != config["telegram"]["admin"]
+                    and subscriber.chat_id != config["telegram"]["admin_id"]
+                    and (username != config["telegram"]["admin"])
                 ):
+                    print("{}".format(config["telegram"]["admin_id"]))
                     await update.message.chat.send_message(
                         "Sorry. Hetznerbot is no longer public."
                     )
