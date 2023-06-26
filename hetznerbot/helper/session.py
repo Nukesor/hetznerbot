@@ -50,7 +50,7 @@ def session_wrapper(send_message=True):
                 ):
                     print("{}".format(config["telegram"]["admin_id"]))
                     await update.message.chat.send_message(
-                        "Sorry. Hetznerbot is no longer public."
+                        f"Sorry. Hetznerbot is no longer public. (User {chat_id})"
                     )
                     return
 
