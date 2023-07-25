@@ -169,7 +169,7 @@ async def authorize(bot, update, session, subscriber):
     target_subscriber = Subscriber.get_or_create(session, chat_id)
 
     # Check if they are already authorized
-    if subscriber.authorized:
+    if target_subscriber.authorized:
         text = f"User {subscriber.chat_id} is already authorized."
         await bot.send_message(chat_id=update.message.chat_id, text=text)
         return
