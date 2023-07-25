@@ -170,7 +170,7 @@ async def authorize(bot, update, session, subscriber):
 
     # Check if they are already authorized
     if target_subscriber.authorized:
-        text = f"User {subscriber.chat_id} is already authorized."
+        text = f"User {target_subscriber.chat_id} is already authorized."
         await bot.send_message(chat_id=update.message.chat_id, text=text)
         return
 
@@ -179,5 +179,5 @@ async def authorize(bot, update, session, subscriber):
     session.add(subscriber)
     session.commit()
 
-    text = f"User {subscriber.chat_id} has been authorized."
+    text = f"User {target_subscriber.chat_id} has been authorized."
     await bot.send_message(chat_id=update.message.chat_id, text=text)
