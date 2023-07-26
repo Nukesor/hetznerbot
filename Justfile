@@ -30,6 +30,8 @@ format:
     poetry run black hetznerbot
     poetry run isort hetznerbot
 
+import_cpu_data:
+    poetry run python ./main.py import-cpu-data
 
 # Watch for something
 # E.g. `just watch lint` or `just watch test`

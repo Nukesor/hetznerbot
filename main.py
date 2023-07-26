@@ -1,12 +1,13 @@
 #!/bin/env python
 """The main entry point for the bot."""
 from contextlib import contextmanager
+import csv
 
 import typer
 from sqlalchemy_utils.functions import database_exists, create_database, drop_database
 
 from hetznerbot.config import config
-from hetznerbot.db import engine, base
+from hetznerbot.db import engine, base, get_session
 from hetznerbot.models import *  # noqa
 from hetznerbot.hetznerbot import init_app
 
@@ -75,8 +76,28 @@ def run():
         app.run_polling()
 
 
+@cli.command()
+def import_cpu_data():
+    """Import cpu data from the ./data/cpu_data.csv."""
+    session = get_session()
+
+    with open("data/cpu_data.csv", newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            cpu = session.get(Cpu, row["name"])
+
+            if cpu is None:
+                print(f"Adding new CPU {row['name']}")
+                cpu = Cpu(row["name"])
+                session.add(cpu)
+            else:
+                print(f"Updating existing CPU {row['name']}")
+
+            cpu.threads = row["threads"]
+            cpu.release_date = row["release_date"]
+            cpu.multi_thread_rating = row["multi_thread_rating"]
+            cpu.single_thread_rating = row["single_thread_rating"]
+
+
 if __name__ == "__main__":
     cli()
-
-#!/bin/env python
-"""Start the bot."""
