@@ -57,7 +57,14 @@ Dependencies:
 1. Run `just initdb` to initialize the database
 1. Start the bot once with `just run` to create the default config at `~/.config/hetznerbot.toml`
 1. Adjust the config file
+1. Import the cpu data into your database with `just import_cpu_data`.
 1. Start the bot with `just run`
+
+## CPU data
+
+The CPU data is read from `data/cpu_data.csv`.
+
+If you want to help out and add missing CPUs, please go to https://www.cpubenchmark.net/, gather the relevant information and add it to the csv file.
 
 ## Bot Commands
 
