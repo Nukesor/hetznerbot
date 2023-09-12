@@ -98,6 +98,8 @@ def import_cpu_data():
             cpu.multi_thread_rating = row["multi_thread_rating"]
             cpu.single_thread_rating = row["single_thread_rating"]
 
+        session.commit()
+
 
 if __name__ == "__main__":
     cli()
