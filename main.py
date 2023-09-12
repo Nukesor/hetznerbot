@@ -88,15 +88,15 @@ def import_cpu_data():
 
             if cpu is None:
                 print(f"Adding new CPU {row['name']}")
-                cpu = Cpu(row["name"])
+                cpu = Cpu(row["name"].strip())
                 session.add(cpu)
             else:
                 print(f"Updating existing CPU {row['name']}")
 
-            cpu.threads = row["threads"]
-            cpu.release_date = row["release_date"]
-            cpu.multi_thread_rating = row["multi_thread_rating"]
-            cpu.single_thread_rating = row["single_thread_rating"]
+            cpu.threads = row["threads"].strip()
+            cpu.release_date = row["release_date"].strip()
+            cpu.multi_thread_rating = row["multi_thread_rating"].strip()
+            cpu.single_thread_rating = row["single_thread_rating"].strip()
 
         session.commit()
 
