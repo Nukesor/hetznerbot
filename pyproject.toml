@@ -21,10 +21,7 @@ toml = "^0.10"
 typer = "^0.9"
 
 [tool.poetry.dev-dependencies]
-autoflake = "^2"
-black = "^23"
-flake8 = "^6"
-isort = "^5"
+ruff = "^0.2"
 types-toml = "^0.10.8"
 
 [build-system]

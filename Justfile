@@ -17,18 +17,12 @@ setup:
     poetry install
 
 lint:
-    poetry run black --check hetznerbot
-    poetry run isort --check-only hetznerbot
-    poetry run flake8 hetznerbot
+    poetry run ruff check ./hetznerbot --output-format=full
+    poetry run ruff format ./hetznerbot --diff
 
 format:
-    # remove unused imports
-    poetry run autoflake \
-        --remove-all-unused-imports \
-        --recursive \
-        --in-place hetznerbot
-    poetry run black hetznerbot
-    poetry run isort hetznerbot
+    poetry run ruff check --fix ./hetznerbot
+    poetry run ruff format ./hetznerbot
 
 import_cpu_data:
     poetry run python ./main.py import-cpu-data
