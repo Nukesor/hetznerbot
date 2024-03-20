@@ -22,7 +22,7 @@ typer = "^0.9"
 
 [tool.poetry.dev-dependencies]
 autoflake = "^2"
-black = "^23"
+black = "^24"
 flake8 = "^6"
 isort = "^5"
 types-toml = "^0.10.8"
