@@ -1,10 +1,10 @@
-from hetznerbot.models.subscriber import Subscriber
 from telegram.constants import ParseMode
 
 from hetznerbot.config import config
 from hetznerbot.helper import get_subscriber_info, help_text
 from hetznerbot.helper.hetzner import check_all_offers_for_subscriber, send_offers
 from hetznerbot.helper.session import session_wrapper
+from hetznerbot.models.subscriber import Subscriber
 
 
 @session_wrapper()
@@ -82,7 +82,8 @@ async def set_parameter(bot, update, session, subscriber):
             or value == "raid6" == subscriber.hdd_count < 4
         ):
             await chat.send_message(
-                "Invalid raid type for current hdd_count. RAID5 needs at least 3 drives, RAID6 needs at least 4 drives"
+                "Invalid raid type for current hdd_count."
+                + " RAID5 needs at least 3 drives, RAID6 needs at least 4 drives"
             )
             return
 
@@ -94,7 +95,8 @@ async def set_parameter(bot, update, session, subscriber):
         datacenters = ["NBG", "FSN", "HEL", "None"]
         if value not in datacenters:
             await chat.send_message(
-                f'Invalid value for "datacenter". Please send one of these: {datacenters}'
+                'Invalid value for "datacenter".'
+                + f" Please send one of these: {datacenters}"
             )
             return
 

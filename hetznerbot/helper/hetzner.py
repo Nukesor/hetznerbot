@@ -1,4 +1,5 @@
 """Hetzner helper functions."""
+
 import json
 import time
 from datetime import datetime
@@ -22,7 +23,10 @@ def get_hetzner_offers():
     headers = {
         "Content-Type": "application/json, text/plain, */*",
         "Referer": "https://www.hetzner.de/sb",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36",
+        "User-Agent": (
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+            + " (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36"
+        ),
     }
 
     # Hetzner expects a millisecond unix timestamp at the end
@@ -43,14 +47,19 @@ def get_hetzner_offers():
 def populate_disk_data(
     offer_id: int, disks: list[OfferDisk], disk_type: DiskType, disk_size_entry: int
 ):
-    """Either increments the disk count of an existing member of `disks` or creates a new entry in it."""
+    """Set disk data and handle multiple disk types.
+
+    Either increments the disk count of an existing member of `disks`
+    or creates a new entry in it.
+    """
     # skip general, it just repeats the info of other more specific categories.
     if disk_type == "general":
         return
 
     # go through every disk entry
     for disk in disks:
-        # if there's already a disk in the list that matches the current specifications, increment the count.
+        # if there's already a disk in the list that matches the current
+        # specifications, increment the count.
         if disk.type == disk_type and disk.size == disk_size_entry:
             disk.amount += 1
             return
@@ -317,7 +326,11 @@ def format_offers(session, subscriber, offer_subscriber, get_all=False):
         biggest_raid_6_pool = None
         disk_info = ""
         for offer_disk in offer.offer_disks:
-            disk_info += f"\n    - {offer_disk.amount}x *{format_size(offer_disk.size)}* {get_disk_type_name(offer_disk.type)}"
+            disk_info += (
+                f"\n    - {offer_disk.amount}x "
+                + f"*{format_size(offer_disk.size)}* "
+                + f"{get_disk_type_name(offer_disk.type)}"
+            )
             if offer_disk.amount >= 3:
                 raid_5_pool = offer_disk.size * (offer_disk.amount - 1)
                 if not biggest_raid_5_pool or raid_5_pool > biggest_raid_5_pool:
