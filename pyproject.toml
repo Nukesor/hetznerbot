@@ -13,16 +13,16 @@ alembic = "^1"
 dateparser = "^1"
 prettytable = "^3.3.0"
 psycopg2-binary = "^2"
-python-telegram-bot = {extras = ["job-queue"], version = "^20.1"}
+python-telegram-bot = {extras = ["job-queue"], version = "^21.1"}
 requests = "^2"
-sentry-sdk = "^1"
+sentry-sdk = "^2"
 SQLAlchemy = "^2"
 sqlalchemy-utils = "^0.41"
 toml = "^0.10"
-typer = "^0.9"
+typer = "^0.12"
 
 [tool.poetry.dev-dependencies]
-ruff = "^0.2"
+ruff = "^0.4"
 types-toml = "^0.10.8"
 
 [build-system]
