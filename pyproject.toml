@@ -5,6 +5,7 @@ description = "A bot for finding the best offers from hetzner"
 authors = ["Arne Beer <contact@arne.beer>"]
 license = "MIT"
 repository = "https://github.com/nukesor/hetznerbot"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11, <4"
