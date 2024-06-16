@@ -222,7 +222,7 @@ def check_offer_for_subscriber(session, subscriber):
         )
 
     if subscriber.datacenter is not None:
-        query = query.filter(Offer.datacenter != subscriber.datacenter)
+        query = query.filter(Offer.datacenter.startswith(subscriber.datacenter))
 
     if subscriber.ipv4:
         query = query.filter(Offer.ipv4.is_(True))
