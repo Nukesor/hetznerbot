@@ -48,6 +48,7 @@ def get_subscriber_info(subscriber):
     table.add_row(["release_date", f"{subscriber.release_date}"])
     table.add_row(["multi_rating", f"{subscriber.multi_rating}"])
     table.add_row(["single_rating", f"{subscriber.single_rating}"])
+    table.add_row(["datacenter", f"{subscriber.datacenter}"])
     table.add_row(["IPv4", f"{subscriber.ipv4}"])
     table.add_row(["ecc", f"{subscriber.ecc}"])
     table.add_row(["inic", f"{subscriber.inic}"])
