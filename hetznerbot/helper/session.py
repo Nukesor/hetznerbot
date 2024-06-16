@@ -1,4 +1,5 @@
 """Session helper."""
+
 import traceback
 from functools import wraps
 
@@ -57,7 +58,7 @@ def session_wrapper(send_message=True):
                 await func(context.bot, update, session, subscriber)
                 session.commit()
             except:  # noqa E722
-                if send_message:
+                if send_message and update.message is not None:
                     await context.bot.sendMessage(
                         chat_id=update.message.chat_id,
                         text="An unknown error occurred.",
