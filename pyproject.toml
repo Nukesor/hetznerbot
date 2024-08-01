@@ -11,9 +11,9 @@ package-mode = false
 python = ">=3.11, <4"
 alembic = "^1"
 dateparser = "^1"
-prettytable = "^3.3.0"
+prettytable = "^3.10.2"
 psycopg2-binary = "^2"
-python-telegram-bot = {extras = ["job-queue", "webhooks"], version = "^21.2"}
+python-telegram-bot = {extras = ["job-queue", "webhooks"], version = "^21.4"}
 requests = "^2"
 sentry-sdk = "^2"
 SQLAlchemy = "^2"
