@@ -1,4 +1,5 @@
 """Config for hetznerbot."""
+
 import os
 import sys
 

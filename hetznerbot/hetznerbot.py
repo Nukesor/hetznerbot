@@ -1,4 +1,5 @@
 """A bot which checks if there is a new record in the server section of hetzner."""
+
 from telegram.ext import Application, CommandHandler
 
 from hetznerbot.commands import (
