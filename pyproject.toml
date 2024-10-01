@@ -13,7 +13,7 @@ alembic = "^1"
 dateparser = "^1"
 prettytable = "^3.11.0"
 psycopg2-binary = "^2"
-python-telegram-bot = {extras = ["job-queue", "webhooks"], version = "^21.5"}
+python-telegram-bot = {extras = ["job-queue", "webhooks"], version = "^21.6"}
 requests = "^2"
 sentry-sdk = "^2"
 SQLAlchemy = "^2"
