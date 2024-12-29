@@ -13,13 +13,13 @@ alembic = "^1"
 dateparser = "^1"
 prettytable = "^3.12.0"
 psycopg2-binary = "^2"
-python-telegram-bot = {extras = ["job-queue", "webhooks"], version = "^21.8"}
+python-telegram-bot = { extras = ["job-queue", "webhooks"], version = "^21.8" }
 requests = "^2"
 sentry-sdk = "^2"
 SQLAlchemy = "^2"
 sqlalchemy-utils = "^0.41"
 toml = "^0.10"
-typer = "^0.14"
+typer = "^0.15"
 
 [tool.poetry.dev-dependencies]
 ruff = "^0.8"
@@ -36,25 +36,22 @@ build-backend = "poetry.masonry.api"
 line-length = 88
 indent-width = 4
 target-version = "py311"
-exclude = [
-    ".venv",
-    "__init__.py",
-]
+exclude = [".venv", "__init__.py"]
 
 [tool.ruff.lint]
 select = [
-    "E", # Pycodestyle
-    "F", # Pyflakes
-    "I", # Isort
-    "UP", # Language feature updates
-    "RUF", # Ruff Rules
+  "E",   # Pycodestyle
+  "F",   # Pyflakes
+  "I",   # Isort
+  "UP",  # Language feature updates
+  "RUF", # Ruff Rules
 ]
 fixable = [
-    "E",
-    "F",
-    "I",
-    "UP", # Language feature updates
-    "RUF", # Ruff Rules
+  "E",
+  "F",
+  "I",
+  "UP",  # Language feature updates
+  "RUF", # Ruff Rules
 ]
 
 # 4. Ignore `E402` (import violations) in all `__init__.py` and misc files.
