@@ -11,6 +11,9 @@ It is possible to set several search parameter which need to be satisfied for an
 
 If the price of an offer is reduced you will get a new notification with the updated price.
 
+This project is mostly used by myself. You may also use it if you like.
+However, I don't plan to provide proper support for this project as I do for my other projects.
+
 Available commands:
 
 ```txt
@@ -49,10 +52,9 @@ Dependencies:
 - Hetznerbot uses postgres by default
 
 1. Clone the repository:
-
-    ```sh
-    git clone git@github.com:nukesor/hetznerbot && cd hetznerbot
-    ```
+   ```sh
+   git clone git@github.com:nukesor/hetznerbot && cd hetznerbot
+   ```
 1. Run `just setup` to install dependencies
 1. Run `just initdb` to initialize the database
 1. Start the bot once with `just run` to create the default config at `~/.config/hetznerbot.toml`
