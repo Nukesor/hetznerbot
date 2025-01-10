@@ -1,31 +1,31 @@
 default: run
 
 run:
-    poetry run python main.py run
+    uv run ./main.py run
 
 initdb *args:
-    poetry run python main.py initdb {{ args }}
-    poetry run alembic --config migrations/alembic.ini stamp head
+    uv run ./main.py initdb {{ args }}
+    uv run alembic --config migrations/alembic.ini stamp head
 
 migrate:
-    poetry run alembic --config migrations/alembic.ini upgrade head
+    uv run alembic --config migrations/alembic.ini upgrade head
 
 generate-migration *args:
-    poetry run alembic --config migrations/alembic.ini revision --autogenerate {{ args }}
+    uv run alembic --config migrations/alembic.ini revision --autogenerate {{ args }}
 
 setup:
-    poetry install
+    uv sync
 
 lint:
-    poetry run ruff check ./hetznerbot --output-format=full
-    poetry run ruff format ./hetznerbot --diff
+    uv run ruff check ./hetznerbot --output-format=full
+    uv run ruff format ./hetznerbot --diff
 
 format:
-    poetry run ruff check --fix ./hetznerbot
-    poetry run ruff format ./hetznerbot
+    uv run ruff check --fix ./hetznerbot
+    uv run ruff format ./hetznerbot
 
 import_cpu_data:
-    poetry run python ./main.py import-cpu-data
+    uv run ./main.py import-cpu-data
 
 # Watch for something
 # E.g. `just watch lint` or `just watch test`
