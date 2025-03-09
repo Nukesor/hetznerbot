@@ -4,13 +4,7 @@ on:
   push:
     branches:
       - main
-    paths:
-      - ".github/**/*"
-      - "hetznerbot/**"
   pull_request:
-    paths:
-      - ".github/**/*"
-      - "hetznerbot/**"
 
 defaults:
   run:
@@ -18,10 +12,10 @@ defaults:
 
 jobs:
   lint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12"]
+        python-version: ["3.13"]
       fail-fast: false
 
     steps:
@@ -36,23 +30,19 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/prebuilt-mpr-archive-keyring.gpg] https://proget.makedeb.org prebuilt-mpr $(lsb_release -cs)" | sudo tee /etc/apt/sources.list.d/prebuilt-mpr.list
           sudo apt update
 
-      - name: Install dev dependencies
+      - name: Install just
         run: sudo apt install just
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "poetry"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install Python dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          poetry install
+        run: just setup
 
       - name: Lint
-        run: |
-          just lint
+        run: just lint
