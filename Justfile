@@ -19,10 +19,12 @@ setup:
 lint:
     uv run ruff check ./hetznerbot --output-format=full
     uv run ruff format ./hetznerbot --diff
+    taplo format --check
 
 format:
     uv run ruff check --fix ./hetznerbot
     uv run ruff format ./hetznerbot
+    taplo format
 
 import_cpu_data:
     uv run ./main.py import-cpu-data
