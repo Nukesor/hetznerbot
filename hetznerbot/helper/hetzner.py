@@ -31,7 +31,7 @@ def get_hetzner_offers():
 
     # Hetzner expects a millisecond unix timestamp at the end
     unix_timestamp = int(time.time() * 1000)
-    url = f"https://www.hetzner.com/_resources/app/jsondata/live_data_sb.json?m={unix_timestamp}"
+    url = f"https://www.hetzner.com/_resources/app/data/app/live_data_sb_EUR.json"
     try:
         response = request("GET", url, headers=headers)
         data = json.loads(response.content)
@@ -40,6 +40,7 @@ def get_hetzner_offers():
         print("Connection error while retrieving data.")
         return None
     except JSONDecodeError or UnicodeDecodeError:
+        print("Failed to decode json.")
         sentry.capture_exception()
         return None
 

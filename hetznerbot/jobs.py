@@ -18,6 +18,7 @@ async def process_all(context, session):
     # Get hetzner offers. Early return if it doesn't work
     incoming_offers = get_hetzner_offers()
     if incoming_offers is None:
+        print("Failed to receive Hetzner offers")
         return
 
     update_offers(session, incoming_offers)
