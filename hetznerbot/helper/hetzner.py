@@ -1,7 +1,6 @@
 """Hetzner helper functions."""
 
 import json
-import time
 from datetime import datetime
 from json import JSONDecodeError
 
@@ -29,9 +28,7 @@ def get_hetzner_offers():
         ),
     }
 
-    # Hetzner expects a millisecond unix timestamp at the end
-    unix_timestamp = int(time.time() * 1000)
-    url = f"https://www.hetzner.com/_resources/app/data/app/live_data_sb_EUR.json"
+    url = "https://www.hetzner.com/_resources/app/data/app/live_data_sb_EUR.json"
     try:
         response = request("GET", url, headers=headers)
         data = json.loads(response.content)
