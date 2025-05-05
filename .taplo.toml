@@ -1,3 +1,5 @@
+exclude = [".venv/**/*.toml", "venv/**/*.toml"]
+
 [formatting]
 indent_string = "    "
 reorder_arrays = true
