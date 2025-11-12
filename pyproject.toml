@@ -26,8 +26,8 @@ Repository = "https://github.com/nukesor/hetznerbot"
 venv = ".venv"
 venvPath = "."
 
-[tool.uv]
-dev-dependencies = ["ruff>=0.8", "types-toml>=0.10.8"]
+[dependency-groups]
+dev = ["ruff>=0.8", "types-toml>=0.10.8"]
 
 # Check the Ruff documentation for more info on how to configure this
 # General docs: https://docs.astral.sh/ruff/configuration/
