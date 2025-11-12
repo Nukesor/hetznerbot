@@ -1,5 +1,6 @@
 #!/bin/env python
 """The main entry point for the bot."""
+
 from contextlib import contextmanager
 import csv
 
@@ -83,7 +84,14 @@ def import_cpu_data():
 
     with open("data/cpu_data.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
+        known_cpus = []
         for row in reader:
+            # Check for duplicate entries in data
+            if row["name"] in known_cpus:
+                print(f"DUPLICATE CPU: {row['name']}")
+                continue
+            known_cpus.append(row["name"])
+
             cpu = session.get(Cpu, row["name"])
 
             if cpu is None:

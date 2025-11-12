@@ -6,6 +6,7 @@ run:
 initdb *args:
     uv run ./main.py initdb {{ args }}
     uv run alembic --config migrations/alembic.ini stamp head
+    uv run ./main.py import-cpu-data
 
 migrate:
     uv run alembic --config migrations/alembic.ini upgrade head
