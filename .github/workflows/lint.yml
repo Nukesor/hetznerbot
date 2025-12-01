@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Clone the repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # This has been done according to https://docs.makedeb.org/prebuilt-mpr/getting-started/
       # This is needed for packages: just
