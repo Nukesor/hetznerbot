@@ -59,7 +59,7 @@ def get_subscriber_info(subscriber):
     table = table.get_string()
 
     status = "activated" if subscriber.active else "deactivated (Use /start to activate)"
-    status = f"Bot is **{status}**"
+    status = f"Bot is *{status}*"
 
     # Return the info in a pretty monospace markdown table.
     return f"{status}\n```\n{table}\n```"
