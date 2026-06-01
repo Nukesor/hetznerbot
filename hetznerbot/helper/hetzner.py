@@ -7,8 +7,7 @@ from json import JSONDecodeError
 import telegram
 from requests import request
 from requests.exceptions import ConnectionError
-from sqlalchemy import select, update
-from sqlalchemy.sql.selectable import and_
+from sqlalchemy import func, select, update
 
 from hetznerbot.config import config
 from hetznerbot.helper.disk_type import DiskType
@@ -92,7 +91,7 @@ def update_offers(session, incoming_offers):
 
             disk_array = incoming_offer["serverDiskData"][disk_type]
             for disk_size_entry in disk_array:
-                populate_disk_data(offer.id, new_disks, disk_type, disk_size_entry)
+                populate_disk_data(offer.id, new_disks, DiskType[disk_type], disk_size_entry)
 
         # Create two sets, representing the old disk pool and the new disk pool.
         old_disks_set = set(
@@ -102,7 +101,7 @@ def update_offers(session, incoming_offers):
             ]
         )
         new_disks_set = set(
-            [f"{disks.type}-{disks.size}-{disks.amount}" for disks in new_disks]
+            [f"{disks.type.name}-{disks.size}-{disks.amount}" for disks in new_disks]
         )
 
         # Check if the set of disks changed. If that's the case, update the disks
@@ -174,19 +173,21 @@ def check_offers_for_subscribers(session):
 
 def check_offer_for_subscriber(session, subscriber):
     """Check the offers for a specific subscriber."""
+    # Sum disk counts across all disk groups where each disk is large enough.
+    disk_count_subq = (
+        select(func.sum(OfferDisk.amount))
+        .where(OfferDisk.offer_id == Offer.id)
+        .where(OfferDisk.size >= subscriber.hdd_size)
+        .correlate(Offer)
+        .scalar_subquery()
+    )
+
     query = (
         select(Offer)
         .filter(Offer.deactivated.is_(False))
         .filter(Offer.price <= subscriber.price * 100)
         .filter(Offer.ram >= subscriber.ram)
-        .filter(
-            Offer.offer_disks.any(
-                and_(
-                    OfferDisk.size >= subscriber.hdd_size,
-                    OfferDisk.amount >= subscriber.hdd_count,
-                )
-            )
-        )
+        .filter(disk_count_subq >= subscriber.hdd_count)
         .filter(
             Offer.cpu.in_(
                 session.query(Cpu.name)

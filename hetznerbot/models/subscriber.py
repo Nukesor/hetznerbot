@@ -13,9 +13,9 @@ class Subscriber(base):
     active = Column(Boolean, nullable=False, default=True)
 
     hdd_count = Column(Integer, nullable=False, default=3)
-    hdd_size = Column(Integer, nullable=False, default=2048)
+    hdd_size = Column(Integer, nullable=False, default=2000)
     raid = Column(String, default="raid5")
-    after_raid = Column(Integer, nullable=False, default=4096)
+    after_raid = Column(Integer, nullable=False, default=4000)
 
     threads = Column(Integer, nullable=False, default=8)
     release_date = Column(Integer, nullable=False, default=2010)
