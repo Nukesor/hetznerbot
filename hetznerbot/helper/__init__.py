@@ -1,6 +1,8 @@
 """Some static stuff or helper functions for hetzner bot."""
 from prettytable import PrettyTable
 
+from hetznerbot.models.subscriber import Subscriber
+
 help_text = """A handy telegram bot which texts you as soon as there is a viable offer available on the hetzner server market.
 
 It is possible to set several search parameter which need to be satisfied for an offer being sent to you.
@@ -56,5 +58,8 @@ def get_subscriber_info(subscriber):
 
     table = table.get_string()
 
+    status = "activated" if subscriber.active else "deactivated (Use /start to activate)"
+    status = f"Bot is **{status}**"
+
     # Return the info in a pretty monospace markdown table.
-    return f"```\n{table}\n```"
+    return f"{status}\n```\n{table}\n```"

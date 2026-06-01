@@ -63,6 +63,7 @@ target/
 
 # Repository kram
 hetznerbot.db
+offers.json
 
 # Intellij idea stuff
 .idea

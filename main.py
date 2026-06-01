@@ -2,6 +2,7 @@
 """The main entry point for the bot."""
 
 from contextlib import contextmanager
+import json
 import csv
 
 import typer
@@ -11,6 +12,7 @@ from hetznerbot.config import config
 from hetznerbot.db import engine, base, get_session
 from hetznerbot.models import *  # noqa
 from hetznerbot.hetznerbot import init_app
+from hetznerbot.helper.hetzner import get_hetzner_offers
 
 cli = typer.Typer()
 
@@ -20,6 +22,18 @@ def wrap_echo(msg: str):
     typer.echo(f"{msg}... ", nl=False)
     yield
     typer.echo("done.")
+
+
+@cli.command()
+def dump_offers():
+    """Download the current live Hetzner offer data to ./offers.json."""
+    offers = get_hetzner_offers()
+    if offers is None:
+        raise typer.Exit(code=1)
+
+    with open("offers.json", "w") as f:
+        json.dump(offers, f, indent=2)
+    print(f"Wrote {len(offers)} offers to offers.json")
 
 
 @cli.command()

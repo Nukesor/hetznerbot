@@ -42,6 +42,7 @@ def init_app():
     stop_handler = CommandHandler("stop", stop, block=False)
     start_handler = CommandHandler("start", start, block=False)
     authorize_handler = CommandHandler("authorize", authorize, block=False)
+    register_handler = CommandHandler("register", authorize, block=False)
 
     # Add handler
     app.add_handler(help_handler)
@@ -51,5 +52,6 @@ def init_app():
     app.add_handler(stop_handler)
     app.add_handler(start_handler)
     app.add_handler(authorize_handler)
+    app.add_handler(register_handler)
 
     return app
