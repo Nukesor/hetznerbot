@@ -7,7 +7,7 @@ from json import JSONDecodeError
 import telegram
 from requests import request
 from requests.exceptions import ConnectionError
-from sqlalchemy import func, select, update
+from sqlalchemy import and_, func, select, update
 
 from hetznerbot.config import config
 from hetznerbot.helper.disk_type import DiskType
@@ -203,13 +203,19 @@ def check_offer_for_subscriber(session, subscriber):
     if subscriber.raid == "raid5":
         query = query.filter(
             Offer.offer_disks.any(
-                (OfferDisk.amount - 1) * OfferDisk.size >= subscriber.after_raid,
+                and_(
+                    OfferDisk.amount >= 3,
+                    (OfferDisk.amount - 1) * OfferDisk.size >= subscriber.after_raid,
+                )
             )
         )
     elif subscriber.raid == "raid6":
         query = query.filter(
             Offer.offer_disks.any(
-                (OfferDisk.amount - 2) * OfferDisk.size >= subscriber.after_raid,
+                and_(
+                    OfferDisk.amount >= 4,
+                    (OfferDisk.amount - 2) * OfferDisk.size >= subscriber.after_raid,
+                )
             )
         )
 
