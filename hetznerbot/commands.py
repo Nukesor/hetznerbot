@@ -178,7 +178,7 @@ async def authorize(bot, update, session, subscriber):
 
     # Authorize and eventually create the subscriber
     target_subscriber.authorized = True
-    session.add(subscriber)
+    session.add(target_subscriber)
     session.commit()
 
     text = f"User {target_subscriber.chat_id} has been authorized."

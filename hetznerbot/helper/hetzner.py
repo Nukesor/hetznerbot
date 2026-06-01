@@ -36,7 +36,7 @@ def get_hetzner_offers():
     except ConnectionError:
         print("Connection error while retrieving data.")
         return None
-    except JSONDecodeError or UnicodeDecodeError:
+    except (JSONDecodeError, UnicodeDecodeError):
         print("Failed to decode json.")
         sentry.capture_exception()
         return None
@@ -429,7 +429,7 @@ async def send_offers(bot, subscriber, session, get_all=False):
                 session.delete(subscriber)
                 session.commit()
 
-        if formatted_offers == 5:
+        if len(formatted_offers) >= 5:
             await bot.sendMessage(
                 chat_id=subscriber.chat_id,
                 text="Too many results, please narrow down your search a little.",
