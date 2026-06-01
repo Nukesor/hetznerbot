@@ -182,7 +182,6 @@ def check_offer_for_subscriber(session, subscriber):
         .filter(
             Offer.offer_disks.any(
                 and_(
-                    OfferDisk.type == DiskType.hdd,
                     OfferDisk.size >= subscriber.hdd_size,
                     OfferDisk.amount >= subscriber.hdd_count,
                 )
@@ -203,19 +202,13 @@ def check_offer_for_subscriber(session, subscriber):
     if subscriber.raid == "raid5":
         query = query.filter(
             Offer.offer_disks.any(
-                and_(
-                    OfferDisk.type == DiskType.hdd,
-                    (OfferDisk.amount - 1) * OfferDisk.size >= subscriber.after_raid,
-                )
+                (OfferDisk.amount - 1) * OfferDisk.size >= subscriber.after_raid,
             )
         )
     elif subscriber.raid == "raid6":
         query = query.filter(
             Offer.offer_disks.any(
-                and_(
-                    OfferDisk.type == DiskType.hdd,
-                    (OfferDisk.amount - 2) * OfferDisk.size >= subscriber.after_raid,
-                )
+                (OfferDisk.amount - 2) * OfferDisk.size >= subscriber.after_raid,
             )
         )
 
@@ -269,7 +262,7 @@ async def notify_about_new_cpu(context, session):
     not_yet_notified = []
     for offer in offers_with_new_cpus:
         if offer.cpu not in context.bot_data["new_cpus"]:
-            not_yet_notified = [offer]
+            not_yet_notified.append(offer)
 
     # Early return if there's nothing to do
     if len(not_yet_notified) == 0:

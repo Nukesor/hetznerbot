@@ -78,8 +78,8 @@ async def set_parameter(bot, update, session, subscriber):
 
         # Check if raid is possible with hdd_count
         if (
-            value == "raid5" == subscriber.hdd_count < 3
-            or value == "raid6" == subscriber.hdd_count < 4
+            (value == "raid5" and subscriber.hdd_count < 3)
+            or (value == "raid6" and subscriber.hdd_count < 4)
         ):
             await chat.send_message(
                 "Invalid raid type for current hdd_count."
