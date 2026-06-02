@@ -91,7 +91,9 @@ def update_offers(session, incoming_offers):
 
             disk_array = incoming_offer["serverDiskData"][disk_type]
             for disk_size_entry in disk_array:
-                populate_disk_data(offer.id, new_disks, DiskType[disk_type], disk_size_entry)
+                populate_disk_data(
+                    offer.id, new_disks, DiskType[disk_type], disk_size_entry
+                )
 
         # Create two sets, representing the old disk pool and the new disk pool.
         old_disks_set = set(
@@ -304,9 +306,9 @@ def format_offers(session, subscriber, offer_subscriber, get_all=False):
 
         # Whether this is a new entry or a price reduction occured.
         if offer_subscriber.new:
-            offer_status = "(New)"
+            offer_status = "(*New*)"
         else:
-            offer_status = "(Price reduction)"
+            offer_status = "(*Price reduction*)"
 
         # Format extra features
         extra_features = ""
@@ -347,7 +349,10 @@ def format_offers(session, subscriber, offer_subscriber, get_all=False):
 
         # First chunk of data
         updated_date = offer.last_update.strftime("%d.%m - %H:%M")
-        formatted_offer = f"""*Offer {offer.id} {offer_status}:* [ {updated_date} ]"""
+        url = f"https://www.hetzner.com/de/sb/#search={offer.id}"
+        formatted_offer = (
+            f"""*Offer* [{offer.id}]({url}) {offer_status}: [ {updated_date} ]"""
+        )
 
         # Add cpu info, if possible
         cpu = session.get(Cpu, offer.cpu)
@@ -408,14 +413,9 @@ def format_size(disk_size: int) -> str:
 async def send_offers(bot, subscriber, session, get_all=False):
     """Send the newest update to all subscribers."""
     # Extract message meta data
-    if get_all:
-        formatted_offers = format_offers(
-            session, subscriber, subscriber.offer_subscriber, get_all=True
-        )
-    else:
-        formatted_offers = format_offers(
-            session, subscriber, subscriber.offer_subscriber
-        )
+    formatted_offers = format_offers(
+        session, subscriber, subscriber.offer_subscriber, get_all=get_all
+    )
 
     if len(formatted_offers) > 0:
         for chunk in formatted_offers:
@@ -424,6 +424,7 @@ async def send_offers(bot, subscriber, session, get_all=False):
                     chat_id=subscriber.chat_id,
                     text=chunk,
                     parse_mode="Markdown",
+                    disable_web_page_preview=True,
                 )
             except telegram.error.Forbidden:
                 session.delete(subscriber)
