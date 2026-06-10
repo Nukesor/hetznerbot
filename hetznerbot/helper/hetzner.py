@@ -314,34 +314,12 @@ def format_offers(session, subscriber, offer_subscriber, get_all=False):
         extra_features = ""
         if offer.ipv4:
             extra_features += "IPv4 "
-        if offer.ecc:
-            extra_features += "ECC "
         if offer.inic:
             extra_features += "iNIC "
         if offer.hwr:
             extra_features += "HWR "
         if extra_features == "":
             extra_features = "None"
-
-        # Get info on disk sizes
-        biggest_raid_5_pool = None
-        biggest_raid_6_pool = None
-        disk_info = ""
-        for offer_disk in offer.offer_disks:
-            disk_info += (
-                f"\n    - {offer_disk.amount}x "
-                + f"*{format_size(offer_disk.size)}* "
-                + f"{get_disk_type_name(offer_disk.type)}"
-            )
-            if offer_disk.amount >= 3:
-                raid_5_pool = offer_disk.size * (offer_disk.amount - 1)
-                if not biggest_raid_5_pool or raid_5_pool > biggest_raid_5_pool:
-                    biggest_raid_5_pool = raid_5_pool
-
-            if offer_disk.amount >= 4:
-                raid_6_pool = offer_disk.size * (offer_disk.amount - 2)
-                if not biggest_raid_6_pool or raid_6_pool > biggest_raid_6_pool:
-                    biggest_raid_6_pool = raid_6_pool
 
         # Calculate the price including VAT.
         price = offer.price / 100
@@ -364,11 +342,32 @@ def format_offers(session, subscriber, offer_subscriber, get_all=False):
     - Multi: *{cpu.multi_thread_rating}*
     - Single: *{cpu.single_thread_rating}*"""
 
-        # Add ram and disk info
-        formatted_offer += f"""\n_Ram:_ *{offer.ram} GB*
-_Disks:_{disk_info}"""
+        # Add ram
+        formatted_offer += f"\n_Ram:_ *{offer.ram} GB*"
+        if offer.ecc:
+            formatted_offer += " (ECC)"
 
-        # Add raid info, if desired
+        # Add disk and raid info
+        formatted_offer += "\n_Disks:_"
+        # Get info on disk sizes
+        biggest_raid_5_pool = None
+        biggest_raid_6_pool = None
+        for offer_disk in offer.offer_disks:
+            formatted_offer += (
+                f"\n    - {offer_disk.amount}x "
+                + f"*{format_size(offer_disk.size)}* "
+                + f"{get_disk_type_name(offer_disk.type)}"
+            )
+            if offer_disk.amount >= 3:
+                raid_5_pool = offer_disk.size * (offer_disk.amount - 1)
+                if not biggest_raid_5_pool or raid_5_pool > biggest_raid_5_pool:
+                    biggest_raid_5_pool = raid_5_pool
+
+            if offer_disk.amount >= 4:
+                raid_6_pool = offer_disk.size * (offer_disk.amount - 2)
+                if not biggest_raid_6_pool or raid_6_pool > biggest_raid_6_pool:
+                    biggest_raid_6_pool = raid_6_pool
+
         if subscriber.raid == "raid5":
             pool_string = (
                 f"{format_size(biggest_raid_5_pool)}" if biggest_raid_5_pool else "n/a"
