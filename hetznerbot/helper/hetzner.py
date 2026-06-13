@@ -77,6 +77,7 @@ def update_offers(session, incoming_offers):
         if not offer:
             offer = Offer(incoming_offer["key"])
             session.add(offer)
+            offer.first_seen_at = datetime.now()
 
         offer.cpu = incoming_offer["cpu"].strip()
         offer.ram = incoming_offer["ram_size"]
