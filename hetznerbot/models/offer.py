@@ -24,6 +24,7 @@ class Offer(base):
 
     # Save the net price in cents
     price = Column(Integer, nullable=False)
+    first_seen_at = Column(DateTime, server_default=func.now(), nullable=False)
     last_update = Column(DateTime, server_default=func.now(), nullable=False)
 
     offer_subscriber = relationship("OfferSubscriber", back_populates="offer")
